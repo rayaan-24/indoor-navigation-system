@@ -606,6 +606,14 @@ export default function Explore() {
             destinationId={toLocation?.id}
             routePathPoints={activeFloorPath}
             onRoomClick={handleRoomClick}
+            onSetStart={(loc) => {
+              setFromLocation(loc);
+              setFromQuery(loc.name);
+            }}
+            onSetEnd={(loc) => {
+              setToLocation(loc);
+              setToQuery(loc.name);
+            }}
             locations={combinedLocations}
           />
         </div>

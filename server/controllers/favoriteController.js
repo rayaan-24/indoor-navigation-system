@@ -2,15 +2,11 @@ const Favorite = require('../models/Favorite');
 
 // @desc    Get user favorites
 // @route   GET /api/favorites
-// @access  Public (Uses userId param or fallback to demo user in Phase 2)
+// @access  Private
 const getFavorites = async (req, res, next) => {
   try {
-    const { userId } = req.query;
-    let query = {};
-    if (userId && userId.match(/^[0-9a-fA-F]{24}$/)) {
-      query.userId = userId;
-    }
-    const favorites = await Favorite.find(query);
+    const userId = req.user._id;
+    const favorites = await Favorite.find({ userId });
     res.status(200).json({
       success: true,
       data: favorites
@@ -22,11 +18,19 @@ const getFavorites = async (req, res, next) => {
 
 // @desc    Add a location to favorites
 // @route   POST /api/favorites
-// @access  Public
+// @access  Private
 const createFavorite = async (req, res, next) => {
   try {
-    const { userId, locationId, locationType } = req.body;
-    
+    const userId = req.user._id;
+    const { locationId, locationType } = req.body;
+
+    if (!locationId || !locationType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide locationId and locationType.'
+      });
+    }
+
     // Check if duplicate exists
     const duplicate = await Favorite.findOne({ userId, locationId });
     if (duplicate) {
@@ -49,22 +53,22 @@ const createFavorite = async (req, res, next) => {
 
 // @desc    Remove location from favorites
 // @route   DELETE /api/favorites/:id
-// @access  Public
+// @access  Private
 const deleteFavorite = async (req, res, next) => {
   try {
-    // Can delete by Favorite object ID or custom locationId string if matched
+    const userId = req.user._id;
     let favorite;
+
     if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      favorite = await Favorite.findByIdAndDelete(req.params.id);
+      favorite = await Favorite.findOneAndDelete({ _id: req.params.id, userId });
     } else {
-      const { userId } = req.query;
       favorite = await Favorite.findOneAndDelete({ userId, locationId: req.params.id });
     }
 
     if (!favorite) {
       return res.status(404).json({
         success: false,
-        message: 'Favorite not found'
+        message: 'Favorite not found or not owned by current profile'
       });
     }
 

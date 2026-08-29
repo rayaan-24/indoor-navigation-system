@@ -4,9 +4,10 @@ const {
   getHistory,
   createHistory
 } = require('../controllers/historyController');
+const { authenticate } = require('../middleware/auth');
 
 router.route('/')
-  .get(getHistory)
-  .post(createHistory);
+  .get(authenticate, getHistory)
+  .post(authenticate, createHistory);
 
 module.exports = router;

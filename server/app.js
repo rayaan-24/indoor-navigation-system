@@ -62,9 +62,17 @@ app.use((req, res, next) => {
 // Centralized error handler
 app.use((err, req, res, next) => {
   console.error('Error stack:', err.stack);
-  res.status(err.status || 500).json({
+  
+  const status = err.status || 500;
+  let message = err.message || 'Internal Server Error';
+  
+  if (status === 500 && process.env.NODE_ENV === 'production') {
+    message = 'Something went wrong. Please try again later.';
+  }
+  
+  res.status(status).json({
     success: false,
-    message: err.message || 'Internal Server Error'
+    message
   });
 });
 

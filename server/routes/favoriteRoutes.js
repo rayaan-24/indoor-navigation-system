@@ -5,12 +5,13 @@ const {
   createFavorite,
   deleteFavorite
 } = require('../controllers/favoriteController');
+const { authenticate } = require('../middleware/auth');
 
 router.route('/')
-  .get(getFavorites)
-  .post(createFavorite);
+  .get(authenticate, getFavorites)
+  .post(authenticate, createFavorite);
 
 router.route('/:id')
-  .delete(deleteFavorite);
+  .delete(authenticate, deleteFavorite);
 
 module.exports = router;

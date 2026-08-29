@@ -7,14 +7,15 @@ const {
   updateRoute,
   deleteRoute
 } = require('../controllers/routeController');
+const { authenticate, authorize } = require('../middleware/auth');
 
 router.route('/')
-  .get(getRoutes)
-  .post(createRoute);
+  .get(authenticate, authorize('admin'), getRoutes)
+  .post(authenticate, authorize('admin'), createRoute);
 
 router.route('/:id')
   .get(getRouteById)
-  .put(updateRoute)
-  .delete(deleteRoute);
+  .put(authenticate, authorize('admin'), updateRoute)
+  .delete(authenticate, authorize('admin'), deleteRoute);
 
 module.exports = router;

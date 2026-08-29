@@ -7,14 +7,15 @@ const {
   updateFloor,
   deleteFloor
 } = require('../controllers/floorController');
+const { authenticate, authorize } = require('../middleware/auth');
 
 router.route('/')
   .get(getFloors)
-  .post(createFloor);
+  .post(authenticate, authorize('admin'), createFloor);
 
 router.route('/:id')
   .get(getFloorById)
-  .put(updateFloor)
-  .delete(deleteFloor);
+  .put(authenticate, authorize('admin'), updateFloor)
+  .delete(authenticate, authorize('admin'), deleteFloor);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import AdminLayout from '../components/layout/AdminLayout';
+import ProtectedRoute from '../components/common/ProtectedRoute';
 
 import Home from '../pages/Home';
 import Explore from '../pages/Explore';
@@ -43,12 +44,12 @@ export default function AppRoutes() {
         <Route path="help" element={<Help />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="feedback" element={<Feedback />} />
+        <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
       </Route>
 
       {/* Admin Panel Pages */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminLayout /></ProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="buildings" element={<AdminBuildings />} />
         <Route path="floors" element={<AdminFloors />} />

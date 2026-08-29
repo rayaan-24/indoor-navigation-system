@@ -1,24 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { MapPin, Menu, X, User, LogOut, Compass, Building2, Search, Settings } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Check login state on mount and location changes
-  useEffect(() => {
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
-  }, [location]);
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
+    logout();
     navigate('/');
   };
 
@@ -56,7 +47,7 @@ export default function Header() {
                 `flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-slate-100 text-brand-secondary'
-                    : 'text-brand-text hover:bg-slate-55/40 hover:text-brand-secondary hover:bg-slate-50'
+                    : 'text-brand-text hover:bg-slate-55/40 hover:text-brand-secondary hover:bg-slate-55'
                 }`
               }
             >
@@ -67,7 +58,7 @@ export default function Header() {
 
         {/* Right Actions */}
         <div className="hidden md:flex items-center space-x-3">
-          {isLoggedIn ? (
+          {isAuthenticated && user ? (
             <>
               {/* User Dropdown/Profile Link */}
               <Link
@@ -75,13 +66,13 @@ export default function Header() {
                 className="flex items-center space-x-2 text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-2 py-1.5 rounded-md hover:bg-slate-50"
               >
                 <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold border border-slate-300">
-                  {localStorage.getItem('userName')?.[0]?.toUpperCase() || 'U'}
+                  {user.name?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span>Profile</span>
               </Link>
               
               {/* Optional Admin quick link */}
-              {localStorage.getItem('userEmail') === 'admin@indoornav.com' && (
+              {user.role === 'admin' && (
                 <Link
                   to="/admin"
                   className="p-2 text-brand-muted hover:text-brand-secondary transition-colors"
@@ -118,7 +109,7 @@ export default function Header() {
 
         {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center space-x-2">
-          {isLoggedIn && localStorage.getItem('userEmail') === 'admin@indoornav.com' && (
+          {isAuthenticated && user?.role === 'admin' && (
             <Link to="/admin" className="p-1.5 text-brand-muted hover:text-brand-secondary">
               <Settings className="w-5 h-5" />
             </Link>
@@ -146,7 +137,7 @@ export default function Header() {
                 `flex items-center px-3 py-2.5 rounded-md text-base font-medium transition-colors ${
                   isActive
                     ? 'bg-slate-100 text-brand-secondary'
-                    : 'text-brand-text hover:bg-slate-50 hover:text-brand-secondary'
+                    : 'text-brand-text hover:bg-slate-55'
                 }`
               }
             >
@@ -155,7 +146,7 @@ export default function Header() {
           ))}
           <hr className="my-2 border-slate-200" />
           <div className="pt-2 flex flex-col space-y-2">
-            {isLoggedIn ? (
+            {isAuthenticated && user ? (
               <>
                 <Link
                   to="/profile"
@@ -163,7 +154,7 @@ export default function Header() {
                   className="flex items-center space-x-3 px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50 hover:text-brand-secondary"
                 >
                   <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold">
-                    {localStorage.getItem('userName')?.[0]?.toUpperCase() || 'U'}
+                    {user.name?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <span>My Profile</span>
                 </Link>
@@ -182,7 +173,7 @@ export default function Header() {
               <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50 hover:text-brand-secondary"
+                className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-55"
               >
                 <User className="w-5 h-5 mr-3" />
                 Login

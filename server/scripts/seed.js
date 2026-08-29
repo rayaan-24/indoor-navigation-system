@@ -13,6 +13,7 @@ const Room = require('../models/Room');
 const Landmark = require('../models/Landmark');
 const Route = require('../models/Route');
 const Feedback = require('../models/Feedback');
+const Connection = require('../models/Connection');
 
 const seedDatabase = async () => {
   try {
@@ -28,6 +29,7 @@ const seedDatabase = async () => {
     await Landmark.deleteMany({});
     await Route.deleteMany({});
     await Feedback.deleteMany({});
+    await Connection.deleteMany({});
     console.log('Cleared existing collections.');
 
     // 2. Seed Users
@@ -580,6 +582,39 @@ const seedDatabase = async () => {
 
     const feedback = await Feedback.insertMany(demoReports);
     console.log(`Seeded ${feedback.length} user issues reports.`);
+
+    // 8. Seed Connections (Graph Edges)
+    const connectionsData = [
+      // Ground Floor (Floor 0) Block B
+      { fromNode: 'b-entrance', toNode: 'b-elevator-0', distance: 50, type: 'corridor', floor: 0, pathPoints: [{ x: 500, y: 850 }, { x: 500, y: 700 }, { x: 450, y: 700 }, { x: 450, y: 550 }] },
+      { fromNode: 'b-entrance', toNode: 'b-seminar-hall', distance: 45, type: 'corridor', floor: 0, pathPoints: [{ x: 500, y: 850 }, { x: 500, y: 700 }, { x: 250, y: 700 }, { x: 250, y: 550 }, { x: 200, y: 300 }] },
+      { fromNode: 'b-seminar-hall', toNode: 'b-restroom-0', distance: 15, type: 'corridor', floor: 0, pathPoints: [{ x: 200, y: 300 }, { x: 100, y: 550 }] },
+      { fromNode: 'b-restroom-0', toNode: 'b-elevator-0', distance: 30, type: 'corridor', floor: 0, pathPoints: [{ x: 100, y: 550 }, { x: 450, y: 550 }] },
+      { fromNode: 'b-elevator-0', toNode: 'b-staircase-0', distance: 60, type: 'corridor', floor: 0, pathPoints: [{ x: 450, y: 550 }, { x: 900, y: 550 }] },
+      { fromNode: 'b-staircase-0', toNode: 'b-cafeteria', distance: 40, type: 'corridor', floor: 0, pathPoints: [{ x: 900, y: 550 }, { x: 800, y: 300 }] },
+
+      // Multi-floor transitions
+      { fromNode: 'b-elevator-0', toNode: 'b-elevator-1', distance: 10, type: 'elevator', floor: 0, pathPoints: [{ x: 450, y: 550 }] },
+      { fromNode: 'b-elevator-1', toNode: 'b-elevator-2', distance: 10, type: 'elevator', floor: 1, pathPoints: [{ x: 450, y: 550 }] },
+      { fromNode: 'b-staircase-0', toNode: 'b-staircase-1', distance: 15, type: 'stairs', floor: 0, pathPoints: [{ x: 900, y: 550 }] },
+      { fromNode: 'b-staircase-1', toNode: 'b-staircase-2', distance: 15, type: 'stairs', floor: 1, pathPoints: [{ x: 900, y: 550 }] },
+
+      // 1st Floor (Floor 1) Block B
+      { fromNode: 'b-programming-lab', toNode: 'b-elevator-1', distance: 40, type: 'corridor', floor: 1, pathPoints: [{ x: 200, y: 300 }, { x: 450, y: 550 }] },
+      { fromNode: 'b-programming-lab', toNode: 'b-restroom-1', distance: 15, type: 'corridor', floor: 1, pathPoints: [{ x: 200, y: 300 }, { x: 100, y: 550 }] },
+      { fromNode: 'b-cs-office', toNode: 'b-staircase-1', distance: 30, type: 'corridor', floor: 1, pathPoints: [{ x: 800, y: 300 }, { x: 900, y: 550 }] },
+      { fromNode: 'b-cs-office', toNode: 'b-elevator-1', distance: 50, type: 'corridor', floor: 1, pathPoints: [{ x: 800, y: 300 }, { x: 450, y: 550 }] },
+
+      // 2nd Floor (Floor 2) Block B
+      { fromNode: 'b-comp-lab-204', toNode: 'b-elevator-2', distance: 35, type: 'corridor', floor: 2, pathPoints: [{ x: 500, y: 300 }, { x: 450, y: 550 }] },
+      { fromNode: 'b-comp-lab-204', toNode: 'b-staircase-2', distance: 40, type: 'corridor', floor: 2, pathPoints: [{ x: 500, y: 300 }, { x: 900, y: 550 }] },
+      { fromNode: 'b-comp-lab-204', toNode: 'b-restroom-2', distance: 20, type: 'corridor', floor: 2, pathPoints: [{ x: 500, y: 300 }, { x: 100, y: 550 }] },
+      { fromNode: 'b-hod-cs', toNode: 'b-restroom-2', distance: 10, type: 'corridor', floor: 2, pathPoints: [{ x: 200, y: 300 }, { x: 100, y: 550 }] },
+      { fromNode: 'b-research-lab', toNode: 'b-staircase-2', distance: 25, type: 'corridor', floor: 2, pathPoints: [{ x: 800, y: 300 }, { x: 900, y: 550 }] }
+    ];
+
+    const seededConnections = await Connection.insertMany(connectionsData);
+    console.log(`Seeded ${seededConnections.length} Graph Connection Edges.`);
 
     console.log('Database Seeding Completed Successfully.');
     process.exit(0);

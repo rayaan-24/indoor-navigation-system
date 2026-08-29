@@ -6,13 +6,14 @@ const {
   createFeedback,
   updateFeedback
 } = require('../controllers/feedbackController');
+const { authenticate, authorize } = require('../middleware/auth');
 
 router.route('/')
-  .get(getFeedback)
-  .post(createFeedback);
+  .get(authenticate, authorize('admin'), getFeedback)
+  .post(authenticate, createFeedback);
 
 router.route('/:id')
-  .get(getFeedbackById)
-  .put(updateFeedback);
+  .get(authenticate, authorize('admin'), getFeedbackById)
+  .put(authenticate, authorize('admin'), updateFeedback);
 
 module.exports = router;

@@ -7,14 +7,15 @@ const {
   updateRoom,
   deleteRoom
 } = require('../controllers/roomController');
+const { authenticate, authorize } = require('../middleware/auth');
 
 router.route('/')
   .get(getRooms)
-  .post(createRoom);
+  .post(authenticate, authorize('admin'), createRoom);
 
 router.route('/:id')
   .get(getRoomById)
-  .put(updateRoom)
-  .delete(deleteRoom);
+  .put(authenticate, authorize('admin'), updateRoom)
+  .delete(authenticate, authorize('admin'), deleteRoom);
 
 module.exports = router;

@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, ShieldAlert } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const validate = () => {
     const tempErrors: typeof errors = {};
@@ -27,31 +32,35 @@ export default function Login() {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setSubmitError('');
 
-    // Simulate network delay
-    setTimeout(() => {
-      setIsSubmitting(false);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email);
-      
-      // Admin bypass
-      if (email === 'admin@indoornav.com') {
-        localStorage.setItem('userName', 'Admin User');
-        navigate('/admin');
-      } else {
-        localStorage.setItem('userName', email.split('@')[0]);
-        navigate('/profile');
+    try {
+      const res = await login(email, password);
+      if (res.success) {
+        // Redirect user back to the route they originally tried to access, or default based on role
+        const origin = (location.state as any)?.from?.pathname;
+        if (res.data.role === 'admin') {
+          navigate(origin || '/admin');
+        } else {
+          navigate(origin || '/profile');
+        }
       }
-    }, 1000);
+    } catch (err: any) {
+      console.error('Login submit error:', err);
+      const errMsg = err.response?.data?.message || 'Invalid email or password. Please verify credentials.';
+      setSubmitError(errMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-slate-50">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-md space-y-6">
         
         {/* Header Title */}
@@ -60,11 +69,11 @@ export default function Login() {
           <p className="text-brand-muted text-xs mt-2">Access your favorite locations and route history.</p>
         </div>
 
-        {/* Demo Credentials Alert */}
-        <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-[11px] text-brand-primary">
+        {/* Credentials Alert */}
+        <div className="p-3 bg-blue-50/80 border border-blue-100 rounded-lg text-[11px] text-brand-primary">
           <p className="font-bold flex items-center mb-1">
             <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1" />
-            Phase 1 Frontend Mocks Available:
+            Verifiable Campus Accounts:
           </p>
           <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
             <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: 123456)</li>
@@ -72,11 +81,17 @@ export default function Login() {
           </ul>
         </div>
 
+        {submitError && (
+          <div className="p-3 bg-red-50 border border-red-100 text-brand-accent-dest rounded-lg text-xs font-semibold text-center animate-fade-in">
+            {submitError}
+          </div>
+        )}
+
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           {/* Email field */}
           <div className="space-y-1">
             <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Email Address</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white">
+            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
               <Mail className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="email"
@@ -91,11 +106,11 @@ export default function Login() {
 
           {/* Password field */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
               <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Password</label>
-              <a href="#forgot" className="text-[10px] font-bold text-brand-secondary hover:underline">Forgot password?</a>
+              <a href="#forgot" className="text-[10px] text-brand-secondary hover:underline font-semibold">Forgot?</a>
             </div>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white">
+            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
               <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="password"
@@ -108,35 +123,20 @@ export default function Login() {
             {errors.password && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.password}</span>}
           </div>
 
-          {/* Remember me checkbox */}
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              type="checkbox"
-              className="h-4 w-4 rounded border-slate-300 text-brand-secondary focus:ring-brand-secondary"
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-xs text-brand-primary select-none cursor-pointer">
-              Remember my session
-            </label>
-          </div>
-
-          {/* Submit Button */}
+          {/* Submit CTA */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2.5 px-4 text-sm shadow hover:bg-blue-700 disabled:opacity-50 transition-all cursor-pointer"
+            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? 'Authenticating...' : 'Login'}
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <div className="text-center pt-2">
-          <p className="text-xs text-brand-muted">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-bold text-brand-secondary hover:underline">
-              Create one here.
-            </Link>
-          </p>
+        {/* Redirect toggle */}
+        <div className="text-center pt-2 text-xs">
+          <span className="text-brand-muted">New to campus? </span>
+          <Link to="/register" className="font-bold text-brand-secondary hover:underline">Create an Account</Link>
         </div>
 
       </div>

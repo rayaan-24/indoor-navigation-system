@@ -37,6 +37,10 @@ app.get('/api/floors/:floorId/rooms', getRoomsByFloor);
 app.get('/api/floors/:floorId/landmarks', getLandmarksByFloor);
 
 // Register base routers
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/navigation', require('./routes/navigationRoutes'));
+app.use('/api/connections', require('./routes/connectionRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/buildings', require('./routes/buildingRoutes'));
 app.use('/api/floors', require('./routes/floorRoutes'));
 app.use('/api/rooms', require('./routes/roomRoutes'));

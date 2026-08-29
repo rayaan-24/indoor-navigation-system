@@ -1,70 +1,104 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Heart, History, Navigation, Eye, LogOut, Settings } from 'lucide-react';
-import { mockLocations } from '../../data/mockLocations';
-import { mockBuildings } from '../../data/mockBuildings';
-import type { HistoryItem } from '../../types';
+import { User, Mail, Heart, History, Navigation, Eye, LogOut, Settings, ArrowRight } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { getRooms } from '../../services/roomService';
+import { getLandmarks } from '../../services/landmarkService';
+import type { HistoryItem, Location } from '../../types';
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState('John Doe');
-  const [userEmail, setUserEmail] = useState('john.doe@campus.edu');
-  const [favorites, setFavorites] = useState<typeof mockLocations>([]);
+  const { user, logout } = useAuth();
+
+  const [favorites, setFavorites] = useState<Location[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Check login session & load user data
+  // Load Favorites and history on mount
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (!isLoggedIn) {
-      navigate('/login');
-      return;
-    }
+    const loadUserData = async () => {
+      try {
+        setLoading(true);
+        // Load Favorites list from localStorage
+        const savedFavIds = JSON.parse(localStorage.getItem('favorites') || '[]');
+        
+        // Fetch all rooms and landmarks to resolve names
+        const [rRes, lRes] = await Promise.all([
+          getRooms(),
+          getLandmarks()
+        ]);
 
-    setUserName(localStorage.getItem('userName') || 'John Doe');
-    setUserEmail(localStorage.getItem('userEmail') || 'john.doe@campus.edu');
+        const roomsData = rRes.success ? rRes.data : [];
+        const landmarksData = lRes.success ? lRes.data : [];
 
-    // Load Favorites from localStorage
-    const savedFavIds = JSON.parse(localStorage.getItem('favorites') || '[]');
-    let mappedFavs = mockLocations.filter((l) => savedFavIds.includes(l.id));
-    
-    // Pre-populate demo favorites if empty
-    if (savedFavIds.length === 0) {
-      const demoFavIds = ['b-comp-lab-204', 'a-central-library'];
-      mappedFavs = mockLocations.filter((l) => demoFavIds.includes(l.id));
-      localStorage.setItem('favorites', JSON.stringify(demoFavIds));
-    }
-    setFavorites(mappedFavs);
+        const roomsMapped: Location[] = roomsData.map((r: any) => ({
+          id: r.roomNumber || r._id,
+          name: r.name,
+          category: r.roomType,
+          buildingId: r.buildingId?.code || r.buildingId,
+          floor: r.floorId?.floorNumber !== undefined ? r.floorId.floorNumber : 0,
+          description: r.description || '',
+          coordinates: r.coordinates
+        }));
 
-    // Load Navigation History
-    const savedHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
-    let finalHistory = savedHistory;
-    
-    // Pre-populate demo history if empty
-    if (savedHistory.length === 0) {
-      const demoHistory: HistoryItem[] = [
-        {
-          id: 'hist-1',
-          fromLocation: { name: 'Main Entrance (Block B)', building: 'Block B', floor: 'Floor 0' },
-          toLocation: { name: 'Computer Laboratory B204', building: 'Block B', floor: 'Floor 2' },
-          timestamp: new Date(Date.now() - 3600000 * 2).toLocaleString(),
-        },
-        {
-          id: 'hist-2',
-          fromLocation: { name: 'Admin Main Entrance', building: 'Block C', floor: 'Floor 0' },
-          toLocation: { name: 'Central Library (Block A)', building: 'Block A', floor: 'Floor 1' },
-          timestamp: new Date(Date.now() - 3600000 * 24).toLocaleString(),
-        },
-      ];
-      finalHistory = demoHistory;
-      localStorage.setItem('navHistory', JSON.stringify(demoHistory));
-    }
-    setHistory(finalHistory);
-  }, [navigate]);
+        const landmarksMapped: Location[] = landmarksData.map((l: any) => ({
+          id: l._id,
+          name: l.name,
+          category: l.type,
+          buildingId: l.buildingId?.code || l.buildingId,
+          floor: l.floorId?.floorNumber !== undefined ? l.floorId.floorNumber : 0,
+          description: l.description || '',
+          coordinates: l.coordinates
+        }));
+
+        const allLocs = [...roomsMapped, ...landmarksMapped];
+        let mappedFavs = allLocs.filter((l) => savedFavIds.includes(l.id));
+
+        // Pre-populate demo favorites if empty
+        if (savedFavIds.length === 0) {
+          const demoFavIds = ['b-comp-lab-204', 'a-central-library'];
+          mappedFavs = allLocs.filter((l) => demoFavIds.includes(l.id));
+          localStorage.setItem('favorites', JSON.stringify(demoFavIds));
+        }
+        setFavorites(mappedFavs);
+
+        // Load Navigation History
+        const savedHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
+        let finalHistory = savedHistory;
+        
+        // Pre-populate demo history if empty
+        if (savedHistory.length === 0) {
+          const demoHistory: HistoryItem[] = [
+            {
+              id: 'hist-1',
+              fromLocation: { name: 'Main Entrance (Block B)', building: 'Block B', floor: 'Floor 0' },
+              toLocation: { name: 'Computer Laboratory B204', building: 'Block B', floor: 'Floor 2' },
+              timestamp: new Date(Date.now() - 3600000 * 2).toLocaleString(),
+            },
+            {
+              id: 'hist-2',
+              fromLocation: { name: 'Admin Main Entrance', building: 'Block C', floor: 'Floor 0' },
+              toLocation: { name: 'Central Library (Block A)', building: 'Block A', floor: 'Floor 1' },
+              timestamp: new Date(Date.now() - 3600000 * 24).toLocaleString(),
+            },
+          ];
+          finalHistory = demoHistory;
+          localStorage.setItem('navHistory', JSON.stringify(demoHistory));
+        }
+        setHistory(finalHistory);
+
+      } catch (err) {
+        console.error('Error loading profile listings:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
+    logout();
     navigate('/');
   };
 
@@ -79,6 +113,8 @@ export default function Profile() {
     setHistory([]);
   };
 
+  if (!user) return null;
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
@@ -89,19 +125,22 @@ export default function Profile() {
             <User className="w-8 h-8 text-brand-secondary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-brand-primary">{userName}</h1>
+            <h1 className="text-2xl font-bold text-brand-primary">{user.name}</h1>
             <p className="text-xs text-brand-muted flex items-center mt-1">
               <Mail className="w-3.5 h-3.5 mr-1" />
-              {userEmail}
+              {user.email}
+              <span className="ml-2.5 px-2 py-0.5 rounded bg-blue-50 text-[10px] text-brand-secondary font-bold capitalize">
+                {user.role} Account
+              </span>
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {userEmail === 'admin@indoornav.com' && (
+          {user.role === 'admin' && (
             <Link
               to="/admin"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-250 bg-white px-4 py-2 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors border-slate-200"
             >
               <Settings className="w-4 h-4 mr-1.5" />
               Admin Portal
@@ -117,153 +156,139 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left: Saved Favorites (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-base font-bold text-brand-primary mb-4 flex items-center border-b border-slate-100 pb-3">
-              <Heart className="w-5 h-5 text-brand-accent-dest mr-2 fill-brand-accent-dest" />
-              <span>Favorite Locations ({favorites.length})</span>
-            </h3>
-
-            {favorites.length > 0 ? (
-              <div className="space-y-3">
-                {favorites.map((loc) => {
-                  const bName = mockBuildings.find(b => b.id === loc.buildingId)?.name || loc.buildingId;
-                  
-                  return (
-                    <div
-                      key={loc.id}
-                      className="p-4 border border-slate-100 rounded-lg flex items-center justify-between hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="space-y-0.5">
-                        <h4 className="text-sm font-bold text-brand-primary">{loc.name}</h4>
-                        <p className="text-[10px] text-brand-muted">
-                          {bName} • Floor {loc.floor} • {loc.category}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Link
-                          to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                          className="p-1.5 bg-blue-50 hover:bg-blue-100 text-brand-secondary rounded transition-colors"
-                          title="Navigate to room"
-                        >
-                          <Navigation className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          to={`/locations/${loc.id}`}
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-brand-primary rounded transition-colors"
-                          title="View Details"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleRemoveFavorite(loc.id)}
-                          className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-brand-accent-dest rounded transition-colors cursor-pointer"
-                          title="Remove favorite"
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-xs text-brand-muted">
-                <Heart className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p>No favorites saved yet. Add rooms to favorites from their detail pages.</p>
-              </div>
-            )}
-          </div>
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-96 animate-pulse">
+          <div className="bg-slate-100 rounded-xl"></div>
+          <div className="bg-slate-100 rounded-xl"></div>
         </div>
-
-        {/* Right: Recent Navigation History (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <h3 className="text-base font-bold text-brand-primary flex items-center">
-                <History className="w-5 h-5 text-brand-secondary mr-2" />
-                <span>Recent Navigation Activity</span>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Left: Saved Favorites (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <h3 className="text-base font-bold text-brand-primary mb-4 flex items-center border-b border-slate-100 pb-3">
+                <Heart className="w-5 h-5 text-brand-accent-dest mr-2 fill-brand-accent-dest" />
+                <span>Favorite Locations ({favorites.length})</span>
               </h3>
-              {history.length > 0 && (
-                <button
-                  onClick={handleClearHistory}
-                  className="text-xs font-bold text-brand-muted hover:text-brand-accent-dest cursor-pointer"
-                >
-                  Clear History
-                </button>
+
+              {favorites.length > 0 ? (
+                <div className="space-y-3">
+                  {favorites.map((loc) => {
+                    const bName = loc.buildingId.replace('-', ' ');
+                    
+                    return (
+                      <div
+                        key={loc.id}
+                        className="p-4 border border-slate-100 rounded-lg flex items-center justify-between hover:bg-slate-50 transition-colors"
+                      >
+                        <div className="space-y-0.5">
+                          <h4 className="font-bold text-xs text-brand-primary">{loc.name}</h4>
+                          <p className="text-[10px] text-brand-muted capitalize">
+                            {bName} • Floor {loc.floor} • {loc.category}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center space-x-1.5">
+                          <Link
+                            to={`/explore?to=${encodeURIComponent(loc.name)}`}
+                            className="p-1.5 bg-blue-50 text-brand-secondary rounded hover:bg-blue-100"
+                            title="Navigate Here"
+                          >
+                            <Navigation className="w-3.5 h-3.5" />
+                          </Link>
+                          <Link
+                            to={`/locations/${loc.id}`}
+                            className="p-1.5 border border-slate-200 text-brand-muted hover:text-brand-primary rounded hover:bg-white"
+                            title="View Details"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </Link>
+                          <button
+                            onClick={() => handleRemoveFavorite(loc.id)}
+                            className="p-1.5 text-slate-400 hover:text-brand-accent-dest rounded hover:bg-red-50 cursor-pointer"
+                            title="Remove Favorite"
+                          >
+                            <Heart className="w-3.5 h-3.5 fill-current text-brand-accent-dest" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-brand-muted">
+                  You haven't bookmarked any favorite locations yet.
+                </div>
               )}
             </div>
-
-            {history.length > 0 ? (
-              <div className="space-y-4">
-                {history.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-4 border border-slate-100 rounded-lg space-y-3 hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-brand-muted font-medium">{item.timestamp}</span>
-                      <Link
-                        to={`/explore?from=${encodeURIComponent(item.fromLocation.name)}&to=${encodeURIComponent(item.toLocation.name)}`}
-                        className="inline-flex items-center text-[10px] font-bold text-brand-secondary hover:underline"
-                      >
-                        <Navigation className="w-3 h-3 mr-1" />
-                        Navigate Again
-                      </Link>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs font-semibold text-brand-primary">
-                      <div className="flex flex-col">
-                        <span>{item.fromLocation.name}</span>
-                        <span className="text-[9px] text-brand-muted font-normal">
-                          {item.fromLocation.building} • {item.fromLocation.floor}
-                        </span>
-                      </div>
-                      <ArrowIcon className="w-4 h-4 text-brand-muted mx-3 flex-shrink-0" />
-                      <div className="flex flex-col text-right">
-                        <span>{item.toLocation.name}</span>
-                        <span className="text-[9px] text-brand-muted font-normal">
-                          {item.toLocation.building} • {item.toLocation.floor}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-xs text-brand-muted">
-                <History className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p>No recent navigation logs found. Your search routes will appear here.</p>
-              </div>
-            )}
           </div>
-        </div>
 
-      </div>
+          {/* Right: Wayfinding Navigation History (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <h3 className="text-base font-bold text-brand-primary flex items-center">
+                  <History className="w-5 h-5 text-brand-secondary mr-2" />
+                  <span>Navigation History</span>
+                </h3>
+                {history.length > 0 && (
+                  <button
+                    onClick={handleClearHistory}
+                    className="text-[10px] font-bold text-brand-muted hover:text-brand-accent-dest cursor-pointer"
+                  >
+                    Clear History
+                  </button>
+                )}
+              </div>
+
+              {history.length > 0 ? (
+                <div className="space-y-4">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3 border border-slate-50 rounded-lg hover:border-slate-200 transition-colors space-y-2 text-xs"
+                    >
+                      <div className="flex justify-between items-center text-[10px] text-brand-muted font-medium">
+                        <span>Logged route run</span>
+                        <span>{item.timestamp}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-brand-primary font-bold">
+                        <div className="text-left">
+                          <p>{item.fromLocation.name}</p>
+                          <span className="text-[9px] text-brand-muted font-normal block capitalize">{item.fromLocation.building.replace('-', ' ')} • {item.fromLocation.floor}</span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-slate-400 mx-2 flex-shrink-0" />
+                        <div className="text-right">
+                          <p>{item.toLocation.name}</p>
+                          <span className="text-[9px] text-brand-muted font-normal block capitalize">{item.toLocation.building.replace('-', ' ')} • {item.toLocation.floor}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-50 flex justify-end">
+                        <Link
+                          to={`/explore?to=${encodeURIComponent(item.toLocation.name)}`}
+                          className="inline-flex items-center text-[10px] font-bold text-brand-secondary hover:underline"
+                        >
+                          <Navigation className="w-3.5 h-3.5 mr-1" />
+                          Re-Run Path
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-brand-muted">
+                  No recently navigated route logs found.
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      )}
 
     </div>
-  );
-}
-
-function ArrowIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
   );
 }

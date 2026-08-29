@@ -7,14 +7,15 @@ const {
   updateBuilding,
   deleteBuilding
 } = require('../controllers/buildingController');
+const { authenticate, authorize } = require('../middleware/auth');
 
 router.route('/')
   .get(getBuildings)
-  .post(createBuilding);
+  .post(authenticate, authorize('admin'), createBuilding);
 
 router.route('/:id')
   .get(getBuildingById)
-  .put(updateBuilding)
-  .delete(deleteBuilding);
+  .put(authenticate, authorize('admin'), updateBuilding)
+  .delete(authenticate, authorize('admin'), deleteBuilding);
 
 module.exports = router;

@@ -254,8 +254,12 @@ const compileRouteDetails = async (graph, path, totalDistance, startNodeId, endN
       pathPoints[edgeFloor] = [];
     }
     
-    // Add pathPoints coordinates
-    edge.pathPoints.forEach((p) => {
+    // Add pathPoints coordinates (reversing if traversed in the opposite direction of database seeding)
+    let points = [...edge.pathPoints];
+    if (edge.fromNode === v && edge.toNode === u) {
+      points.reverse();
+    }
+    points.forEach((p) => {
       pathPoints[edgeFloor].push({ x: p.x, y: p.y });
     });
 

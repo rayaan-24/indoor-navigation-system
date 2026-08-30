@@ -80,12 +80,19 @@ const getBuildingLayout = async (req, res, next) => {
 // @access  Public
 const getBuildingById = async (req, res, next) => {
   try {
-    const building = await Building.findById(req.params.id);
+    let building = null;
+    if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      building = await Building.findById(req.params.id);
+    }
+    
     if (!building) {
-      return res.status(404).json({
-        success: false,
-        message: 'Building not found'
-      });
+      building = await Building.findOne({ code: req.params.id });
+      if (!building) {
+        return res.status(404).json({
+          success: false,
+          message: 'Building not found'
+        });
+      }
     }
     res.status(200).json({
       success: true,

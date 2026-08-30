@@ -42,26 +42,21 @@ const getFloorById = async (req, res, next) => {
 // @access  Public
 const getFloorsByBuilding = async (req, res, next) => {
   try {
-    // Check if building exists first
-    const building = await Building.findById(req.params.buildingId);
+    let building = null;
+    if (req.params.buildingId.match(/^[0-9a-fA-F]{24}$/)) {
+      building = await Building.findById(req.params.buildingId);
+    }
+    
     if (!building) {
-      // Fallback: try querying by building code string (e.g. 'block-b') if not a valid ObjectId
-      let query = { buildingId: req.params.buildingId, isActive: true };
-      if (!req.params.buildingId.match(/^[0-9a-fA-F]{24}$/)) {
-        const bByCode = await Building.findOne({ code: req.params.buildingId });
-        if (!bByCode) {
-          return res.status(404).json({
-            success: false,
-            message: 'Building not found'
-          });
-        }
-        query.buildingId = bByCode._id;
+      // Fallback: try querying by building code string
+      const bByCode = await Building.findOne({ code: req.params.buildingId });
+      if (!bByCode) {
+        return res.status(404).json({
+          success: false,
+          message: 'Building not found'
+        });
       }
-      const floors = await Floor.find(query).sort({ floorNumber: 1 });
-      return res.status(200).json({
-        success: true,
-        data: floors
-      });
+      building = bByCode;
     }
 
     const floors = await Floor.find({ buildingId: building._id, isActive: true }).sort({ floorNumber: 1 });

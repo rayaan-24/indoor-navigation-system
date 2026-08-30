@@ -9,7 +9,7 @@ const app = express();
 
 // Configure CORS
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'http://localhost:5174', process.env.CLIENT_URL].filter(Boolean),
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -50,6 +50,7 @@ app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/favorites', require('./routes/favoriteRoutes'));
 app.use('/api/history', require('./routes/historyRoutes'));
 app.use('/api/search', require('./routes/searchRoutes'));
+app.use('/api/hazards', require('./routes/hazardRoutes'));
 
 // 404 Unknown Route mapping
 app.use((req, res, next) => {

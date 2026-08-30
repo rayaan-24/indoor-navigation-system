@@ -40,6 +40,34 @@ const buildingSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+    width: {
+      type: Number,
+      default: 120
+    },
+    height: {
+      type: Number,
+      default: 94
+    },
+    coordinateSystem: {
+      type: String,
+      default: 'Cartesian top view'
+    },
+    units: {
+      type: String,
+      default: 'meters'
+    },
+    metersPerUnit: {
+      type: Number,
+      default: 1
+    },
+    displayScale: {
+      type: String,
+      default: '1 unit = 1 meter'
+    },
+    pixelsPerMeter: {
+      type: Number,
+      default: 12
+    },
     isActive: {
       type: Boolean,
       default: true

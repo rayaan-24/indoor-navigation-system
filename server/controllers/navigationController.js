@@ -1,4 +1,4 @@
-const { calculateRoute } = require('../services/navigationService');
+const { calculateRoute, calculateEvacuationRoute } = require('../services/navigationService');
 const Room = require('../models/Room');
 const Landmark = require('../models/Landmark');
 
@@ -51,7 +51,6 @@ const getRoute = async (req, res, next) => {
       message: 'Route calculated successfully'
     });
   } catch (error) {
-    // If Dijkstra throws "No route available"
     if (error.message.includes('No available route')) {
       return res.status(404).json({
         success: false,
@@ -62,6 +61,47 @@ const getRoute = async (req, res, next) => {
   }
 };
 
+// @desc    Evacuate to the nearest safe exit
+// @route   POST /api/navigation/evacuate
+// @access  Public
+const evacuateRoute = async (req, res, next) => {
+  try {
+    const { sourceId, preferences } = req.body;
+
+    if (!sourceId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a starting location for evacuation.'
+      });
+    }
+
+    const sourceExists = await Room.findOne({ roomNumber: sourceId }) || await Landmark.findById(sourceId) || await Room.findById(sourceId);
+    if (!sourceExists) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please select a valid starting location.'
+      });
+    }
+
+    const route = await calculateEvacuationRoute(sourceId, preferences);
+
+    res.status(200).json({
+      success: true,
+      data: route.data,
+      message: 'Evacuation route calculated successfully'
+    });
+  } catch (error) {
+    if (error.message.includes('No safe route')) {
+      return res.status(404).json({
+        success: false,
+        message: error.message
+      });
+    }
+    next(error);
+  }
+};
+
 module.exports = {
-  getRoute
+  getRoute,
+  evacuateRoute
 };

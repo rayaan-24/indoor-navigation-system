@@ -10,17 +10,11 @@ export const getBuildingById = async (id: string) => {
   return response.data;
 };
 
-export const getBuildingFloors = async (buildingId: string) => {
-  const response = await api.get(`/buildings/${buildingId}/floors`);
+export const getBuildingLayout = async (buildingId: string) => {
+  const response = await api.get(`/buildings/${buildingId}/layout`);
   return response.data;
 };
 
-export const getBuildingRooms = async (buildingId: string) => {
-  const response = await api.get(`/buildings/${buildingId}/rooms`);
-  return response.data;
-};
-
-// Admin CRUD Operations
 export const createBuilding = async (data: any) => {
   const response = await api.post('/buildings', data);
   return response.data;
@@ -33,5 +27,15 @@ export const updateBuilding = async (id: string, data: any) => {
 
 export const deleteBuilding = async (id: string) => {
   const response = await api.delete(`/buildings/${id}`);
+  return response.data;
+};
+
+export const getBuildingFloors = async (buildingId: string) => {
+  const response = await api.get(`/buildings/${buildingId}/floors`);
+  return response.data;
+};
+
+export const getBuildingRooms = async (buildingId: string) => {
+  const response = await api.get(`/buildings/${buildingId}/rooms`);
   return response.data;
 };

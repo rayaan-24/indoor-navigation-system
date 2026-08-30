@@ -39,6 +39,18 @@ const roomSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+    width: {
+      type: Number
+    },
+    height: {
+      type: Number
+    },
+    areaSqft: {
+      type: Number
+    },
+    areaSqm: {
+      type: Number
+    },
     coordinates: {
       x: { type: Number, required: true },
       y: { type: Number, required: true }

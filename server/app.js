@@ -7,12 +7,8 @@ dotenv.config();
 
 const app = express();
 
-// Configure CORS
-const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174', process.env.CLIENT_URL].filter(Boolean),
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+// Configure CORS (Allow all origins to prevent production CORS mismatches)
+app.use(cors());
 
 // Enable body parser
 app.use(express.json());

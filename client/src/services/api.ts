@@ -1,14 +1,20 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-  let url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-  if (url.endsWith('/')) {
+  let url = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
+  
+  // Remove trailing slashes
+  while (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
-  if (!url.endsWith('/api')) {
-    url = `${url}/api`;
+  
+  // Remove any duplicate /api endings if accidentally present
+  while (url.endsWith('/api')) {
+    url = url.slice(0, -4);
   }
-  return url;
+  
+  // Return clean URL with exactly one /api suffix
+  return `${url}/api`;
 };
 
 const api = axios.create({

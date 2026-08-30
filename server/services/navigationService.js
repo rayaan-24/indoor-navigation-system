@@ -5,6 +5,7 @@ const Waypoint = require('../models/Waypoint');
 const LogicalConnection = require('../models/LogicalConnection');
 const Exit = require('../models/Exit');
 const Hazard = require('../models/Hazard');
+const Door = require('../models/Door');
 
 // Configurable walking speed: 1.2 meters per second (average human pace)
 const WALKING_SPEED_MPS = 1.2;
@@ -48,6 +49,86 @@ const resolveToWaypointId = async (id) => {
   }
 
   return id;
+};
+
+const isPointInRect = (px, py, rx, ry, rw, rh) => {
+  const EPSILON = 0.1; // tolerance
+  return px > rx + EPSILON && px < rx + rw - EPSILON && py > ry + EPSILON && py < ry + rh - EPSILON;
+};
+
+const lineSegmentsIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+  const u_b = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+  if (u_b === 0) return false;
+  const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / u_b;
+  const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / u_b;
+  return (ua >= 0 && ua <= 1) && (ub >= 0 && ub <= 1);
+};
+
+const lineIntersectsRect = (x1, y1, x2, y2, rx, ry, rw, rh) => {
+  if (isPointInRect(x1, y1, rx, ry, rw, rh) || isPointInRect(x2, y2, rx, ry, rw, rh)) {
+    return true;
+  }
+  const x3 = rx, y3 = ry;
+  const x4 = rx + rw, y4 = ry;
+  const x5 = rx, y5 = ry + rh;
+  const x6 = rx + rw, y6 = ry + rh;
+
+  return (
+    lineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) ||
+    lineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x5, y5) ||
+    lineSegmentsIntersect(x1, y1, x2, y2, x4, y4, x6, y6) ||
+    lineSegmentsIntersect(x1, y1, x2, y2, x5, y5, x6, y6)
+  );
+};
+
+const validatePathGeometry = async (path, sourceRoomId, destRoomId) => {
+  const rooms = await Room.find({ isActive: true });
+  const waypoints = await Waypoint.find({});
+  const exits = await Exit.find({});
+
+  const wpMap = {};
+  waypoints.forEach(w => {
+    wpMap[w.waypointId] = { x: w.x, y: w.y };
+  });
+  exits.forEach(e => {
+    wpMap[e.exitId] = { x: e.x, y: e.y };
+  });
+
+  const getRoomNumber = async (id) => {
+    if (!id) return null;
+    const r = await Room.findOne({ roomNumber: id }) || (id.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(id) : null);
+    return r ? r.roomNumber : id;
+  };
+  
+  const startRoomNumber = await getRoomNumber(sourceRoomId);
+  const endRoomNumber = await getRoomNumber(destRoomId);
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const u = path[i];
+    const v = path[i + 1];
+
+    const p1 = wpMap[u];
+    const p2 = wpMap[v];
+
+    if (!p1 || !p2) continue;
+
+    for (const room of rooms) {
+      if (room.roomNumber === startRoomNumber || room.roomNumber === endRoomNumber) {
+        continue;
+      }
+
+      const rx = room.coordinates.x;
+      const ry = room.coordinates.y;
+      const rw = room.width || 8.0;
+      const rh = room.height || 10.0;
+
+      if (lineIntersectsRect(p1.x, p1.y, p2.x, p2.y, rx, ry, rw, rh)) {
+        return { u, v };
+      }
+    }
+  }
+
+  return null;
 };
 
 /**
@@ -117,15 +198,47 @@ const compileRouteDetails = async (graph, path, totalDistance, startNodeId, endN
   const steps = [];
   const floorTransitions = [];
 
-  // Fetch start/end room names
-  const startRoom = await Room.findOne({ roomNumber: startNodeId }) || await Landmark.findById(startNodeId);
-  const endRoom = await Room.findOne({ roomNumber: endNodeId }) || await Landmark.findById(endNodeId) || await Exit.findOne({ exitId: endNodeId });
+  // Fetch start/end room documents
+  const startRoom = await Room.findOne({ roomNumber: startNodeId }) || (startNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(startNodeId) : null) || await Landmark.findById(startNodeId);
+  const endRoom = await Room.findOne({ roomNumber: endNodeId }) || (endNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(endNodeId) : null) || await Landmark.findById(endNodeId) || await Exit.findOne({ exitId: endNodeId });
+
+  // Helper to get room center and door center coordinates
+  const getRoomEntryPoints = async (room) => {
+    if (!room || !room.roomNumber) return null;
+    const conn = await LogicalConnection.findOne({ fromId: room.roomNumber, type: 'room_to_corridor' });
+    if (!conn) return null;
+    const door = await Door.findOne({ doorId: conn.doorId });
+    if (!door) return null;
+    
+    const rx = room.coordinates.x;
+    const ry = room.coordinates.y;
+    const rw = room.width || 8.0;
+    const rh = room.height || 10.0;
+    
+    // Room center
+    const rc = { x: rx + rw / 2, y: ry + rh / 2 };
+    // Door center
+    const dc = { x: door.x + (door.width || 1.0) / 2, y: door.y + (door.height || 1.0) / 2 };
+    
+    return { rc, dc };
+  };
+
+  const startEntry = await getRoomEntryPoints(startRoom);
+  const endEntry = await getRoomEntryPoints(endRoom);
 
   steps.push({
     instruction: `Depart from ${startRoom ? startRoom.name : startNodeId}.`,
     type: 'straight',
     floor: 0
   });
+
+  pathPoints[0] = [];
+
+  // 1. Prepend starting room points: Room Center -> Door Center
+  if (startEntry) {
+    pathPoints[0].push(startEntry.rc);
+    pathPoints[0].push(startEntry.dc);
+  }
 
   for (let i = 0; i < path.length - 1; i++) {
     const u = path[i];
@@ -167,6 +280,12 @@ const compileRouteDetails = async (graph, path, totalDistance, startNodeId, endN
     });
   }
 
+  // 2. Append destination room points: Door Center -> Room Center
+  if (endEntry) {
+    pathPoints[0].push(endEntry.dc);
+    pathPoints[0].push(endEntry.rc);
+  }
+
   steps.push({
     instruction: `Arrive at ${endRoom ? endRoom.name : endNodeId}. Destination is ahead.`,
     type: 'destination',
@@ -198,11 +317,33 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
   // 2. Build adjacency list graph from database (filtering hazards)
   const graph = await buildGraph(avoidStairs);
 
-  // 3. Find primary route
-  const primaryResult = runDijkstra(graph, startWp, endWp);
+  // 3. Find primary route with validation loop
+  let attempts = 0;
+  const maxAttempts = 10;
+  let primaryResult = null;
+  const graphClone = JSON.parse(JSON.stringify(graph));
 
-  if (primaryResult.distance === Infinity) {
-    throw new Error('No available route was found between these locations.');
+  while (attempts < maxAttempts) {
+    primaryResult = runDijkstra(graphClone, startWp, endWp);
+
+    if (primaryResult.distance === Infinity) {
+      throw new Error('No available route was found between these locations.');
+    }
+
+    const invalidEdge = await validatePathGeometry(primaryResult.path, sourceId, destinationId);
+    if (!invalidEdge) {
+      break; // Path is valid!
+    }
+
+    // Prune the invalid edge
+    const { u, v } = invalidEdge;
+    if (graphClone[u]) {
+      graphClone[u] = graphClone[u].filter(n => n.node !== v);
+    }
+    if (graphClone[v]) {
+      graphClone[v] = graphClone[v].filter(n => n.node !== u);
+    }
+    attempts++;
   }
 
   // 4. Compile primary route response details
@@ -231,7 +372,25 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
         altGraph[v] = altGraph[v].filter((n) => n.node !== u);
       }
 
-      const altResult = runDijkstra(altGraph, startWp, endWp);
+      let altAttempts = 0;
+      let altResult = { path: [], distance: Infinity };
+
+      while (altAttempts < maxAttempts) {
+        altResult = runDijkstra(altGraph, startWp, endWp);
+        if (altResult.distance === Infinity) break;
+
+        const invalidAltEdge = await validatePathGeometry(altResult.path, sourceId, destinationId);
+        if (!invalidAltEdge) {
+          break; // Valid alt route found!
+        }
+
+        // Prune the invalid alt edge
+        const { u: au, v: av } = invalidAltEdge;
+        if (altGraph[au]) altGraph[au] = altGraph[au].filter(n => n.node !== av);
+        if (altGraph[av]) altGraph[av] = altGraph[av].filter(n => n.node !== au);
+        altAttempts++;
+      }
+
       if (altResult.distance !== Infinity && altResult.distance !== primaryResult.distance) {
         const altRoute = await compileRouteDetails(
           altGraph,
@@ -283,12 +442,32 @@ const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
   let shortestDistance = Infinity;
   let bestPath = [];
 
-  // 4. Test Dijkstra path to each exit waypoint
+  // 4. Test Dijkstra path to each exit waypoint with validation
   for (const exit of exitWaypoints) {
-    const result = runDijkstra(graph, startWp, exit.wpId);
-    if (result.distance < shortestDistance) {
-      shortestDistance = result.distance;
-      bestPath = result.path;
+    let attempts = 0;
+    const maxAttempts = 5;
+    const graphClone = JSON.parse(JSON.stringify(graph));
+    let pathResult = { path: [], distance: Infinity };
+
+    while (attempts < maxAttempts) {
+      pathResult = runDijkstra(graphClone, startWp, exit.wpId);
+      if (pathResult.distance === Infinity) break;
+
+      const invalidEdge = await validatePathGeometry(pathResult.path, sourceId, exit.exitId);
+      if (!invalidEdge) {
+        break; // Valid route to this exit found!
+      }
+
+      // Prune
+      const { u, v } = invalidEdge;
+      if (graphClone[u]) graphClone[u] = graphClone[u].filter(n => n.node !== v);
+      if (graphClone[v]) graphClone[v] = graphClone[v].filter(n => n.node !== u);
+      attempts++;
+    }
+
+    if (pathResult.distance < shortestDistance) {
+      shortestDistance = pathResult.distance;
+      bestPath = pathResult.path;
       bestExit = exit;
     }
   }

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MapPin, Navigation, Map, Accessibility, AlertTriangle } from 'lucide-react';
+import { MapPin, Navigation, Accessibility, CheckCircle2, Compass } from 'lucide-react';
 import { getBuildings, getBuildingLayout } from '../../services/buildingService';
-import { calculateRoute, calculateEvacuationRoute } from '../../services/navigationService';
+import { calculateRoute } from '../../services/navigationService';
 import { createHistory } from '../../services/historyService';
 import { useAuth } from '../../context/AuthContext';
 import IndoorMap from '../../components/map/IndoorMap';
@@ -24,7 +24,6 @@ export default function Explore() {
   const [lifts, setLifts] = useState<any[]>([]);
   const [exits, setExits] = useState<any[]>([]);
   const [waypoints, setWaypoints] = useState<any[]>([]);
-  const [hazards, setHazards] = useState<any[]>([]);
 
   // Search/Navigation States
   const [fromQuery, setFromQuery] = useState('');
@@ -39,10 +38,6 @@ export default function Explore() {
   const [selectedBuildingId, setSelectedBuildingId] = useState('sjt-ground');
   const [currentFloor, setCurrentFloor] = useState(0);
   const [avoidStairs, setAvoidStairs] = useState(false);
-
-  // Simulated emergency evacuation toggle
-  const [isEvacMode, setIsEvacMode] = useState(false);
-  const [evacInfo, setEvacInfo] = useState<{ exitName: string; hazardsAvoided: string[] } | null>(null);
 
   // Interactive Simulated Navigation Mode States
   const [navigating, setNavigating] = useState(false);
@@ -62,8 +57,6 @@ export default function Explore() {
         const response = await getBuildings();
         if (response.success && response.data.length > 0) {
           setBuildings(response.data);
-          
-          // Default to SJT Ground Floor if seeded, otherwise take the first
           const sjt = response.data.find((b: any) => b.code === 'sjt-ground');
           if (sjt) {
             setSelectedBuildingId('sjt-ground');
@@ -81,28 +74,27 @@ export default function Explore() {
     fetchBuildingsList();
   }, []);
 
-  // 2. Fetch full building layout details (dynamic rooms, corridors, stairs, lifts, exits, waypoints, hazards)
+  // 2. Fetch full building layout details
   useEffect(() => {
     const fetchLayout = async () => {
       try {
         const response = await getBuildingLayout(selectedBuildingId);
         if (response.success && response.data) {
-          const { rooms: rList, corridors: cList, stairs: sList, lifts: lList, exits: eList, doors: dList, waypoints: wList, hazards: hList } = response.data;
+          const { rooms: rList, corridors: cList, stairs: sList, lifts: lList, exits: eList, doors: dList, waypoints: wList } = response.data;
           
-          setRooms(rList);
-          setCorridors(cList);
-          setStairs(sList);
-          setLifts(lList);
-          setExits(eList);
-          setDoors(dList);
-          setWaypoints(wList);
-          setHazards(hList);
+          setRooms(rList || []);
+          setCorridors(cList || []);
+          setStairs(sList || []);
+          setLifts(lList || []);
+          setExits(eList || []);
+          setDoors(dList || []);
+          setWaypoints(wList || []);
 
           // Map landmarks for suggestion filters
           const mappedLandmarks = [
-            ...sList.map((s: any) => ({ ...s, name: s.name, category: 'Staircase' })),
-            ...lList.map((l: any) => ({ ...l, name: l.name, category: 'Elevator' })),
-            ...eList.map((e: any) => ({ ...e, name: e.name, category: 'Exit' }))
+            ...(sList || []).map((s: any) => ({ ...s, name: s.name, category: 'Staircase' })),
+            ...(lList || []).map((l: any) => ({ ...l, name: l.name, category: 'Elevator' })),
+            ...(eList || []).map((e: any) => ({ ...e, name: e.name, category: 'Exit' }))
           ];
           setLandmarks(mappedLandmarks);
         }
@@ -116,12 +108,13 @@ export default function Explore() {
     }
   }, [selectedBuildingId]);
 
-  // 3. Map Mongoose documents to UI Location layout
+  // 3. Map Mongoose documents to UI Location format
   const combinedLocations: Location[] = useMemo(() => {
     const roomsMapped: Location[] = rooms.map(r => ({
       id: r.roomNumber || r._id,
       name: r.name,
       category: r.roomType,
+      department: r.department || '',
       buildingId: selectedBuildingId,
       floor: 0,
       description: r.description || '',
@@ -132,6 +125,7 @@ export default function Explore() {
       id: l.exitId || l.stairId || l.liftId || l._id,
       name: l.name,
       category: l.category,
+      department: '',
       buildingId: selectedBuildingId,
       floor: 0,
       description: l.name,
@@ -141,11 +135,45 @@ export default function Explore() {
     return [...roomsMapped, ...landmarksMapped];
   }, [rooms, landmarks, selectedBuildingId]);
 
+  // Filter and rank suggestion items
+  const getSuggestions = (query: string) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+
+    const matches = combinedLocations.filter(loc => {
+      const idMatch = (loc.id || '').toLowerCase().includes(q);
+      const nameMatch = (loc.name || '').toLowerCase().includes(q);
+      const catMatch = (loc.category || '').toLowerCase().includes(q);
+      const deptMatch = (loc.department || '').toLowerCase().includes(q);
+      return idMatch || nameMatch || catMatch || deptMatch;
+    });
+
+    // Score and rank
+    return matches.sort((a, b) => {
+      const aId = (a.id || '').toLowerCase();
+      const bId = (b.id || '').toLowerCase();
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+
+      const getScore = (id: string, name: string) => {
+        if (id === q) return 1000;
+        if (name === q) return 900;
+        if (id.startsWith(q)) return 800;
+        if (name.startsWith(q)) return 700;
+        if (id.includes(q)) return 600;
+        if (name.includes(q)) return 500;
+        return 400;
+      };
+
+      return getScore(bId, bName) - getScore(aId, aName);
+    });
+  };
+
   // Load recent destinations from localStorage history
   useEffect(() => {
     const savedHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
-    const uniqueDests: string[] = Array.from(new Set(savedHistory.map((h: any) => h.toLocation?.name).filter(Boolean)));
-    setRecentDestinations(uniqueDests.slice(0, 3));
+    const uniqueDests: string[] = Array.from(new Set(savedHistory.map((h: any) => h.toLocation?.name || h.destination).filter(Boolean)));
+    setRecentDestinations(uniqueDests.slice(0, 4));
   }, [activeRoute]);
 
   // Parse query params (e.g., from home page redirects)
@@ -156,38 +184,41 @@ export default function Explore() {
     const searchParam = searchParams.get('search');
 
     if (toParam) {
-      const match = combinedLocations.find(l => l.name.toLowerCase() === toParam.toLowerCase());
+      const match = combinedLocations.find(l => 
+        (l.id && l.id.toLowerCase() === toParam.toLowerCase()) || 
+        (l.name && l.name.toLowerCase() === toParam.toLowerCase())
+      );
       if (match) {
         setToLocation(match);
-        setToQuery(match.name);
+        setToQuery(`${match.id} - ${match.name}`);
         setCurrentFloor(match.floor);
       }
     } else if (searchParam) {
       const match = combinedLocations.find(l => 
-        l.name.toLowerCase().includes(searchParam.toLowerCase())
+        (l.id && l.id.toLowerCase().includes(searchParam.toLowerCase())) ||
+        (l.name && l.name.toLowerCase().includes(searchParam.toLowerCase()))
       );
       if (match) {
         setToLocation(match);
-        setToQuery(match.name);
+        setToQuery(`${match.id} - ${match.name}`);
         setCurrentFloor(match.floor);
       }
     }
 
-    // Default starting room to G01 for demo convenience
-    const defaultStart = combinedLocations.find(l => l.id === 'G01');
-    if (defaultStart) {
-      setFromLocation(defaultStart);
-      setFromQuery(defaultStart.name);
+    // Default starting room to G01 for user convenience
+    if (!fromLocation) {
+      const defaultStart = combinedLocations.find(l => l.id === 'G01');
+      if (defaultStart) {
+        setFromLocation(defaultStart);
+        setFromQuery(`${defaultStart.id} - ${defaultStart.name}`);
+      }
     }
   }, [searchParams, combinedLocations]);
 
   // Autocomplete filter for "From"
   useEffect(() => {
-    if (fromQuery.trim().length > 0 && (!fromLocation || fromLocation.name !== fromQuery)) {
-      const filtered = combinedLocations.filter(loc =>
-        loc.name.toLowerCase().includes(fromQuery.toLowerCase())
-      );
-      setFromSuggestions(filtered);
+    if (fromQuery.trim().length > 0 && (!fromLocation || `${fromLocation.id} - ${fromLocation.name}` !== fromQuery)) {
+      setFromSuggestions(getSuggestions(fromQuery));
     } else {
       setFromSuggestions([]);
     }
@@ -195,42 +226,29 @@ export default function Explore() {
 
   // Autocomplete filter for "To"
   useEffect(() => {
-    if (toQuery.trim().length > 0 && (!toLocation || toLocation.name !== toQuery)) {
-      const filtered = combinedLocations.filter(loc =>
-        loc.name.toLowerCase().includes(toQuery.toLowerCase())
-      );
-      setToSuggestions(filtered);
+    if (toQuery.trim().length > 0 && (!toLocation || `${toLocation.id} - ${toLocation.name}` !== toQuery)) {
+      setToSuggestions(getSuggestions(toQuery));
     } else {
       setToSuggestions([]);
     }
   }, [toQuery, combinedLocations, toLocation]);
 
-  // Calculate Route action (Standard or Evacuation calculations)
-  const handleFindRoute = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fromLocation) return;
+  // Calculate Route action
+  const handleFindRoute = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!fromLocation || !toLocation) return;
 
     setRouteLoading(true);
-    setNavigating(false); 
-    setEvacInfo(null);
+    setNavigating(false);
+    setCurrentStepIdx(0);
+    setError('');
 
     try {
-      let response;
-      if (isEvacMode) {
-        // Run Emergency Evacuation calculations
-        response = await calculateEvacuationRoute({
-          sourceId: fromLocation.id,
-          preferences: { avoidStairs }
-        });
-      } else {
-        // Run Standard Wayfinding calculations
-        if (!toLocation) return;
-        response = await calculateRoute({
-          sourceId: fromLocation.id,
-          destinationId: toLocation.id,
-          preferences: { avoidStairs }
-        });
-      }
+      const response = await calculateRoute({
+        sourceId: fromLocation.id,
+        destinationId: toLocation.id,
+        preferences: { avoidStairs }
+      });
 
       if (response.success && response.data) {
         const routeData = response.data;
@@ -248,41 +266,34 @@ export default function Explore() {
         setActiveRoute(mappedRoute);
         setCurrentFloor(fromLocation.floor);
 
-        if (isEvacMode) {
-          setEvacInfo({
-            exitName: routeData.bestExit,
-            hazardsAvoided: routeData.hazardsAvoided || []
-          });
-        }
-
-        // Log run into MongoDB history collection if authenticated
+        // Log to database history if authenticated
         if (user) {
           try {
             await createHistory({
               userId: user.id,
-              source: fromLocation.name,
-              destination: isEvacMode ? `Evacuation Exit (${routeData.bestExit})` : toLocation!.name,
+              source: `${fromLocation.id} - ${fromLocation.name}`,
+              destination: `${toLocation.id} - ${toLocation.name}`,
               distance: mappedRoute.distance,
               estimatedTime: mappedRoute.duration
             });
 
             const historyItem = {
               id: Math.random().toString(36).substring(2, 9),
-              fromLocation: { name: fromLocation.name, building: selectedBuildingId, floor: `Floor ${fromLocation.floor}` },
-              toLocation: { name: isEvacMode ? `Exit (${routeData.bestExit})` : toLocation!.name, building: selectedBuildingId, floor: `Floor 0` },
+              fromLocation: { name: `${fromLocation.id} - ${fromLocation.name}`, building: selectedBuildingId, floor: `Floor ${fromLocation.floor}` },
+              toLocation: { name: `${toLocation.id} - ${toLocation.name}`, building: selectedBuildingId, floor: `Floor 0` },
               timestamp: new Date().toLocaleString(),
             };
             const existingHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
             localStorage.setItem('navHistory', JSON.stringify([historyItem, ...existingHistory].slice(0, 10)));
           } catch (histErr) {
-            console.warn('Failed to log route to database history:', histErr);
+            console.warn('Failed to log route to history:', histErr);
           }
         }
       }
     } catch (err: any) {
-      console.warn('Route calculations error:', err.message);
-      setError(err.response?.data?.message || 'No safe route was found between these locations.');
-      setTimeout(() => setError(''), 4000);
+      console.warn('Route calculation error:', err.message);
+      setError(err.response?.data?.message || 'No available route was found between these locations.');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setRouteLoading(false);
     }
@@ -291,11 +302,21 @@ export default function Explore() {
   const handleRoomClick = (room: Location) => {
     if (!fromLocation) {
       setFromLocation(room);
-      setFromQuery(room.name);
-    } else if (!isEvacMode) {
+      setFromQuery(`${room.id} - ${room.name}`);
+    } else {
       setToLocation(room);
-      setToQuery(room.name);
+      setToQuery(`${room.id} - ${room.name}`);
     }
+  };
+
+  const handleSetStart = (room: Location) => {
+    setFromLocation(room);
+    setFromQuery(`${room.id} - ${room.name}`);
+  };
+
+  const handleSetEnd = (room: Location) => {
+    setToLocation(room);
+    setToQuery(`${room.id} - ${room.name}`);
   };
 
   const handleClearRoute = () => {
@@ -303,11 +324,10 @@ export default function Explore() {
     setToLocation(null);
     setToQuery('');
     setNavigating(false);
-    setEvacInfo(null);
+    setCurrentStepIdx(0);
   };
 
-  const currentBuilding = buildings.find(b => b.code === selectedBuildingId);
-  const activeFloorPath = activeRoute?.pathPoints[currentFloor] || [];
+  const activeFloorPath = activeRoute?.pathPoints?.[currentFloor] || activeRoute?.pathPoints?.[0] || [];
 
   if (loading) {
     return (
@@ -328,7 +348,7 @@ export default function Explore() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-200">
         <div>
           <h1 className="text-3xl font-extrabold text-brand-primary">Explore & Navigate</h1>
-          <p className="text-brand-muted text-sm mt-1">SJT Ground Floor Map Workspace with dynamic hazard routing.</p>
+          <p className="text-brand-muted text-sm mt-1">Indoor Wayfinding for SJT Ground Floor (Metric Layout • 120m × 94m)</p>
         </div>
 
         {/* Building Selector Dropdown */}
@@ -343,7 +363,7 @@ export default function Explore() {
               setFromLocation(null);
               setFromQuery('');
             }}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-secondary border-slate-250 cursor-pointer animate-fade-in"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-secondary cursor-pointer"
           >
             {buildings.map(b => (
               <option key={b._id} value={b.code}>{b.name}</option>
@@ -353,22 +373,8 @@ export default function Explore() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-150 text-red-650 text-red-600 rounded-xl text-xs font-semibold text-center animate-fade-in">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold text-center animate-fade-in">
           {error}
-        </div>
-      )}
-
-      {/* Evacuation Alert Banner */}
-      {evacInfo && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-250 rounded-xl flex items-start space-x-3 text-xs text-amber-850 text-amber-900 animate-fade-in">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-bold text-sm">Emergency Evacuation Evac Plan Calculated</h4>
-            <p className="mt-1">
-              Follow highlighted path to <strong>{evacInfo.exitName}</strong>. 
-              {evacInfo.hazardsAvoided.length > 0 && ` Active threat sectors avoided: ${evacInfo.hazardsAvoided.join(', ')}.`}
-            </p>
-          </div>
         </div>
       )}
 
@@ -378,34 +384,8 @@ export default function Explore() {
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
             
-            {/* Mode selector tab */}
-            <div className="flex border-b border-slate-200 mb-6 bg-slate-50 p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => { setIsEvacMode(false); handleClearRoute(); }}
-                className={`flex-1 py-2 text-xs font-bold text-center rounded-md transition-all cursor-pointer ${
-                  !isEvacMode 
-                    ? 'bg-white text-blue-600 shadow-sm border border-slate-200/50' 
-                    : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                Normal Route
-              </button>
-              <button
-                type="button"
-                onClick={() => { setIsEvacMode(true); handleClearRoute(); }}
-                className={`flex-1 py-2 text-xs font-bold text-center rounded-md transition-all cursor-pointer ${
-                  isEvacMode 
-                    ? 'bg-red-500 text-white shadow-sm' 
-                    : 'text-red-500 hover:bg-red-50'
-                }`}
-              >
-                🚨 Evacuation Exit
-              </button>
-            </div>
-
             <h2 className="text-lg font-bold text-brand-primary mb-4 flex items-center">
-              <Navigation className="w-5 h-5 text-brand-secondary mr-2" />
+              <Compass className="w-5 h-5 text-brand-secondary mr-2" />
               <span>Wayfinding Planner</span>
             </h2>
 
@@ -415,10 +395,10 @@ export default function Explore() {
               <div className="relative space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-brand-muted">Starting Point</label>
                 <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 focus-within:bg-white focus-within:border-brand-secondary transition-all">
-                  <MapPin className="w-4 h-4 text-brand-muted ml-3 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-emerald-600 ml-3 flex-shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search starting room (e.g., G01)"
+                    placeholder="Search starting room (e.g., G01, G02)"
                     value={fromQuery}
                     onChange={(e) => setFromQuery(e.target.value)}
                     className="w-full px-2.5 py-3 text-xs text-brand-primary bg-transparent focus:outline-none"
@@ -427,63 +407,85 @@ export default function Explore() {
 
                 {/* From Suggestions dropdown */}
                 {fromSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
+                  <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
                     {fromSuggestions.map((loc) => (
                       <button
                         key={loc.id}
                         type="button"
                         onClick={() => {
                           setFromLocation(loc);
-                          setFromQuery(loc.name);
+                          setFromQuery(`${loc.id} - ${loc.name}`);
                           setFromSuggestions([]);
                         }}
-                        className="w-full px-3 py-2.5 hover:bg-slate-50 text-left text-xs text-brand-primary border-b border-slate-100 last:border-0 cursor-pointer"
+                        className="w-full px-3.5 py-2.5 hover:bg-slate-50 text-left transition-colors cursor-pointer"
                       >
-                        {loc.name}
-                        <span className="text-[9px] text-brand-muted block font-semibold">Room {loc.id} • {loc.category}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-extrabold text-[10px] rounded">
+                            {loc.id}
+                          </span>
+                          <span className="font-bold text-xs text-brand-primary">{loc.name}</span>
+                        </div>
+                        <span className="text-[10px] text-brand-muted block font-medium mt-0.5">
+                          SJT · Ground Floor {loc.department ? `· ${loc.department}` : ''} • {loc.category}
+                        </span>
                       </button>
                     ))}
                   </div>
                 )}
+                {fromQuery.trim().length > 0 && fromSuggestions.length === 0 && (!fromLocation || `${fromLocation.id} - ${fromLocation.name}` !== fromQuery) && (
+                  <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 p-3 text-center text-xs text-slate-400">
+                    No matching locations found.
+                  </div>
+                )}
               </div>
 
-              {/* To Input (Hidden during Evacuation Mode) */}
-              {!isEvacMode && (
-                <div className="relative space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-brand-muted">Destination</label>
-                  <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 focus-within:bg-white focus-within:border-brand-secondary transition-all">
-                    <MapPin className="w-4 h-4 text-brand-muted ml-3 flex-shrink-0" />
-                    <input
-                      type="text"
-                      placeholder="Search destination room (e.g., G05)"
-                      value={toQuery}
-                      onChange={(e) => setToQuery(e.target.value)}
-                      className="w-full px-2.5 py-3 text-xs text-brand-primary bg-transparent focus:outline-none"
-                    />
-                  </div>
-
-                  {/* To Suggestions dropdown */}
-                  {toSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
-                      {toSuggestions.map((loc) => (
-                        <button
-                          key={loc.id}
-                          type="button"
-                          onClick={() => {
-                            setToLocation(loc);
-                            setToQuery(loc.name);
-                            setToSuggestions([]);
-                          }}
-                          className="w-full px-3 py-2.5 hover:bg-slate-50 text-left text-xs text-brand-primary border-b border-slate-100 last:border-0 cursor-pointer"
-                        >
-                          {loc.name}
-                          <span className="text-[9px] text-brand-muted block font-semibold">Room {loc.id} • {loc.category}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+              {/* To Input */}
+              <div className="relative space-y-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-brand-muted">Destination</label>
+                <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 focus-within:bg-white focus-within:border-brand-secondary transition-all">
+                  <Navigation className="w-4 h-4 text-red-500 ml-3 flex-shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search destination (e.g., G07, Smart, G20)"
+                    value={toQuery}
+                    onChange={(e) => setToQuery(e.target.value)}
+                    className="w-full px-2.5 py-3 text-xs text-brand-primary bg-transparent focus:outline-none"
+                  />
                 </div>
-              )}
+
+                {/* To Suggestions dropdown */}
+                {toSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
+                    {toSuggestions.map((loc) => (
+                      <button
+                        key={loc.id}
+                        type="button"
+                        onClick={() => {
+                          setToLocation(loc);
+                          setToQuery(`${loc.id} - ${loc.name}`);
+                          setToSuggestions([]);
+                        }}
+                        className="w-full px-3.5 py-2.5 hover:bg-slate-50 text-left transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 font-extrabold text-[10px] rounded">
+                            {loc.id}
+                          </span>
+                          <span className="font-bold text-xs text-brand-primary">{loc.name}</span>
+                        </div>
+                        <span className="text-[10px] text-brand-muted block font-medium mt-0.5">
+                          SJT · Ground Floor {loc.department ? `· ${loc.department}` : ''} • {loc.category}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {toQuery.trim().length > 0 && toSuggestions.length === 0 && (!toLocation || `${toLocation.id} - ${toLocation.name}` !== toQuery) && (
+                  <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 p-3 text-center text-xs text-slate-400">
+                    No matching locations found.
+                  </div>
+                )}
+              </div>
 
               {/* Accessibility Settings */}
               <div className="flex items-center space-x-2 pt-2 border-t border-slate-100">
@@ -501,7 +503,7 @@ export default function Explore() {
               </div>
 
               {/* Recent Destinations shortcut links */}
-              {!isEvacMode && recentDestinations.length > 0 && (
+              {recentDestinations.length > 0 && (
                 <div className="pt-2 border-t border-slate-100">
                   <span className="text-[10px] font-bold text-brand-muted uppercase tracking-wider block mb-1.5">
                     Recent Destinations
@@ -512,10 +514,10 @@ export default function Explore() {
                         key={idx}
                         type="button"
                         onClick={() => {
-                          const match = combinedLocations.find(l => l.name === dest);
+                          const match = combinedLocations.find(l => l.name === dest || `${l.id} - ${l.name}` === dest || l.id === dest);
                           if (match) {
                             setToLocation(match);
-                            setToQuery(match.name);
+                            setToQuery(`${match.id} - ${match.name}`);
                           } else {
                             setToQuery(dest);
                           }
@@ -532,13 +534,11 @@ export default function Explore() {
               <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
-                  disabled={!fromLocation || (!isEvacMode && !toLocation) || routeLoading}
-                  className={`flex-grow inline-flex items-center justify-center rounded-lg text-white font-semibold py-3 px-4 text-xs shadow transition-colors disabled:opacity-50 cursor-pointer ${
-                    isEvacMode ? 'bg-red-500 hover:bg-red-600' : 'bg-brand-secondary hover:bg-blue-700'
-                  }`}
+                  disabled={!fromLocation || !toLocation || routeLoading}
+                  className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary hover:bg-blue-700 text-white font-semibold py-3 px-4 text-xs shadow transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 mr-1.5" />
-                  {routeLoading ? 'Calculating...' : isEvacMode ? 'Evacuate nearest Exit' : 'Calculate Route'}
+                  {routeLoading ? 'Calculating Route...' : 'Calculate Route'}
                 </button>
                 {activeRoute && (
                   <button
@@ -550,116 +550,100 @@ export default function Explore() {
                   </button>
                 )}
               </div>
-
             </form>
           </div>
 
-          {/* Active Navigation Steps List */}
+          {/* Active Route Summary and Direction Steps */}
           {activeRoute && (
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 animate-fade-in">
-              <div className="border-b border-slate-150 pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-brand-primary text-sm">Navigation Guide</h3>
-                  <p className="text-[10px] font-medium text-brand-muted uppercase tracking-wider mt-0.5">Route Directions</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-bold text-brand-secondary block">{activeRoute.distance} meters</span>
-                  <span className="text-[10px] text-brand-muted block">ETA: {activeRoute.duration} min</span>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <span className="text-xs font-bold text-brand-secondary uppercase tracking-wider">Route Summary</span>
+                <div className="flex space-x-3 text-xs font-bold">
+                  <span className="text-brand-primary">{activeRoute.distance} meters</span>
+                  <span className="text-brand-muted">•</span>
+                  <span className="text-emerald-600">{activeRoute.duration} min walk</span>
                 </div>
               </div>
 
-              {!navigating ? (
-                <>
-                  <div className="space-y-4 max-h-[250px] overflow-y-auto pr-1">
-                    {activeRoute.steps.map((step: any, idx: number) => (
-                      <div key={idx} className="flex space-x-3 text-xs">
-                        <div className="flex flex-col items-center">
-                          <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 text-brand-primary font-bold text-[10px]">
-                            {idx + 1}
-                          </div>
-                          {idx < activeRoute.steps.length - 1 && (
-                            <div className="w-0.5 bg-slate-200 flex-grow my-1"></div>
-                          )}
-                        </div>
-                        <div className="pt-0.5">
-                          <p className="text-brand-primary font-medium">{step.instruction}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => {
-                      setNavigating(true);
-                      setCurrentStepIdx(0);
-                    }}
-                    className="w-full mt-4 inline-flex items-center justify-center rounded-lg bg-emerald-650 bg-emerald-650 bg-emerald-600 text-white font-semibold py-2.5 px-4 text-xs shadow hover:bg-emerald-700 transition-colors cursor-pointer"
-                  >
-                    Start Navigation
-                  </button>
-                </>
-              ) : (
-                <div className="bg-slate-900 border border-slate-800 text-white rounded-xl p-4 mt-2 space-y-4 animate-fade-in">
-                  <div className="flex justify-between items-center pb-2 border-b border-slate-800 text-[10px] uppercase font-bold text-slate-400">
-                    <span>Navigation HUD</span>
-                    <button
-                      onClick={() => setNavigating(false)}
-                      className="text-red-400 hover:underline cursor-pointer"
-                    >
-                      Exit Mode
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Step {currentStepIdx + 1} of {activeRoute.steps.length}</span>
-                    <p className="text-sm font-bold leading-normal">{activeRoute.steps[currentStepIdx]?.instruction}</p>
-                  </div>
+              {/* Live Navigation Simulation controls */}
+              <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-lg flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-brand-primary">
+                    {navigating ? `Step ${currentStepIdx + 1} of ${activeRoute.steps.length}` : 'Guided Walk Mode'}
+                  </h4>
+                  <p className="text-[10px] text-brand-muted">
+                    {navigating ? 'Simulating your movement on the floor map.' : 'Step through turn-by-turn directions.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNavigating(!navigating);
+                    setCurrentStepIdx(0);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    navigating ? 'bg-slate-200 text-slate-800' : 'bg-brand-secondary text-white shadow-sm'
+                  }`}
+                >
+                  {navigating ? 'Stop' : 'Start Walk'}
+                </button>
+              </div>
 
-                  <div className="flex justify-between items-center gap-2 pt-2 text-xs">
+              {/* Active Step Highlight during guided navigation */}
+              {navigating && activeRoute.steps[currentStepIdx] && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg space-y-2 animate-fade-in">
+                  <div className="flex items-center space-x-2 text-emerald-800 font-bold text-xs">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Current Direction:</span>
+                  </div>
+                  <p className="text-xs text-brand-primary font-semibold pl-6">
+                    {activeRoute.steps[currentStepIdx].instruction}
+                  </p>
+                  <div className="flex justify-between pt-1 text-[10px]">
                     <button
                       type="button"
                       disabled={currentStepIdx === 0}
-                      onClick={() => setCurrentStepIdx(prev => prev - 1)}
-                      className="flex-1 py-2 border border-slate-700 bg-slate-800 hover:bg-slate-750 text-white font-semibold rounded disabled:opacity-30 cursor-pointer"
+                      onClick={() => setCurrentStepIdx(prev => Math.max(0, prev - 1))}
+                      className="px-2.5 py-1 bg-white border border-slate-200 rounded font-semibold disabled:opacity-40 cursor-pointer"
                     >
-                      Previous
+                      Previous Step
                     </button>
                     <button
                       type="button"
-                      disabled={currentStepIdx === activeRoute.steps.length - 1}
-                      onClick={() => setCurrentStepIdx(prev => prev + 1)}
-                      className="flex-1 py-2 bg-brand-secondary hover:bg-blue-700 text-white font-semibold rounded disabled:opacity-30 cursor-pointer"
+                      disabled={currentStepIdx >= activeRoute.steps.length - 1}
+                      onClick={() => setCurrentStepIdx(prev => Math.min(activeRoute.steps.length - 1, prev + 1))}
+                      className="px-2.5 py-1 bg-emerald-600 text-white rounded font-bold disabled:opacity-40 cursor-pointer"
                     >
                       Next Step
                     </button>
                   </div>
                 </div>
               )}
-            </div>
-          )}
 
-        </div>
-
-        {/* Right Side: Map visual view (8 cols) */}
-        <div className="lg:col-span-8 flex flex-col space-y-4">
-          
-          {/* Map info bar */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center space-x-2">
-              <Map className="w-5 h-5 text-brand-secondary" />
-              <span className="text-sm font-bold text-brand-primary capitalize">
-                {currentBuilding?.name || 'SJT Ground Floor'}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-brand-muted uppercase">Floor Level:</span>
-              <div className="flex bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                <button className="px-3 py-1.5 rounded-md bg-white text-brand-primary shadow-sm text-xs font-semibold">Ground Floor</button>
+              {/* Complete Step-by-Step Directions List */}
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {activeRoute.steps.map((step: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className={`flex items-start space-x-3 p-2.5 rounded-lg text-xs transition-colors ${
+                      navigating && idx === currentStepIdx
+                        ? 'bg-blue-50 border border-blue-200 font-bold text-brand-primary'
+                        : 'hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] flex items-center justify-center mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="leading-snug">{step.instruction}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Interactive SVG IndoorMap */}
+        {/* Right Side: Indoor Map SVG Visualization Canvas (8 cols) */}
+        <div className="lg:col-span-8">
           <IndoorMap
             buildingId={selectedBuildingId}
             floor={currentFloor}
@@ -667,14 +651,8 @@ export default function Explore() {
             destinationId={toLocation?.id}
             routePathPoints={activeFloorPath}
             onRoomClick={handleRoomClick}
-            onSetStart={(loc) => {
-              setFromLocation(loc);
-              setFromQuery(loc.name);
-            }}
-            onSetEnd={(loc) => {
-              setToLocation(loc);
-              setToQuery(loc.name);
-            }}
+            onSetStart={handleSetStart}
+            onSetEnd={handleSetEnd}
             locations={combinedLocations}
             corridors={corridors}
             doors={doors}
@@ -682,12 +660,10 @@ export default function Explore() {
             lifts={lifts}
             exits={exits}
             waypoints={waypoints}
-            hazards={hazards}
           />
         </div>
 
       </div>
-
     </div>
   );
 }

@@ -36,8 +36,6 @@ export default function IndoorMap({
   stairs = [],
   lifts = [],
   exits = [],
-  waypoints = [],
-  hazards = [],
 }: IndoorMapProps) {
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -59,8 +57,8 @@ export default function IndoorMap({
   );
 
   // Handle Zooming
-  const handleZoomIn = () => setScale((prev) => Math.min(prev + 0.2, 3));
-  const handleZoomOut = () => setScale((prev) => Math.max(prev - 0.2, 0.8));
+  const handleZoomIn = () => setScale((prev) => Math.min(prev + 0.25, 3.5));
+  const handleZoomOut = () => setScale((prev) => Math.max(prev - 0.25, 0.75));
   const handleReset = () => {
     setScale(1);
     setPan({ x: 0, y: 0 });
@@ -91,36 +89,8 @@ export default function IndoorMap({
     onRoomClick?.(room);
   };
 
-  // Helper map coordinates lookup for active hazards positioning
-  const waypointMap: Record<string, { x: number; y: number }> = {};
-  waypoints.forEach(wp => {
-    waypointMap[wp.waypointId] = { x: wp.x, y: wp.y };
-  });
-  exits.forEach(ex => {
-    waypointMap[ex.exitId] = { x: ex.x, y: ex.y };
-  });
-
-  const findElementRect = (id: string) => {
-    const corr = corridors.find(c => c.corridorId === id);
-    if (corr) return { x: corr.x, y: corr.y, w: corr.width, h: corr.height };
-
-    const rm = rooms.find(r => r.id === id);
-    if (rm) return { x: rm.coordinates.x, y: rm.coordinates.y, w: 8.0, h: 10.0 }; // estimate dimensions for standard room if missing
-
-    const st = stairs.find(s => s.stairId === id);
-    if (st) return { x: st.x, y: st.y, w: st.width, h: st.height };
-
-    const lf = lifts.find(l => l.liftId === id);
-    if (lf) return { x: lf.x, y: lf.y, w: lf.width, h: lf.height };
-
-    const ex = exits.find(e => e.exitId === id);
-    if (ex) return { x: ex.x, y: ex.y, w: ex.width, h: ex.height };
-
-    return null;
-  };
-
   return (
-    <div className="relative w-full h-[620px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+    <div className="relative w-full h-[640px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col select-none">
       
       {/* Map Control Toolbar */}
       <div className="absolute top-4 right-4 z-20 flex flex-col bg-white rounded-lg shadow-md border border-slate-200 p-1 space-y-1">
@@ -149,11 +119,18 @@ export default function IndoorMap({
 
       {/* Interactive inspected room popup sheet */}
       {inspectedRoom && (
-        <div className="map-overlay absolute top-4 left-4 z-25 bg-white border border-slate-200 rounded-xl p-4 shadow-lg max-w-[260px] animate-fade-in space-y-3">
+        <div className="map-overlay absolute top-4 left-4 z-25 bg-white border border-slate-200 rounded-xl p-4 shadow-lg max-w-[280px] animate-fade-in space-y-3">
           <div className="flex justify-between items-start gap-2">
             <div>
-              <h4 className="font-bold text-xs text-brand-primary leading-tight">{inspectedRoom.name}</h4>
-              <p className="text-[9px] text-brand-muted font-semibold mt-0.5 capitalize">Floor {inspectedRoom.floor} • {inspectedRoom.category}</p>
+              <div className="flex items-center space-x-1.5">
+                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 font-extrabold text-[10px] rounded">
+                  {inspectedRoom.id}
+                </span>
+                <h4 className="font-bold text-xs text-brand-primary leading-tight">{inspectedRoom.name}</h4>
+              </div>
+              <p className="text-[10px] text-brand-muted font-medium mt-1">
+                Floor {inspectedRoom.floor} • {inspectedRoom.category}
+              </p>
             </div>
             <button
               onClick={() => setInspectedRoom(null)}
@@ -169,7 +146,7 @@ export default function IndoorMap({
                 if (onSetStart) onSetStart(inspectedRoom);
                 setInspectedRoom(null);
               }}
-              className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-brand-primary font-bold rounded cursor-pointer transition-colors"
+              className="flex-1 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded cursor-pointer transition-colors border border-emerald-200"
             >
               Set Start
             </button>
@@ -178,9 +155,9 @@ export default function IndoorMap({
                 if (onSetEnd) onSetEnd(inspectedRoom);
                 setInspectedRoom(null);
               }}
-              className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-secondary font-bold rounded cursor-pointer transition-colors"
+              className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-secondary font-bold rounded cursor-pointer transition-colors border border-blue-200"
             >
-              Set Dest
+              Set Destination
             </button>
           </div>
         </div>
@@ -190,6 +167,7 @@ export default function IndoorMap({
       <svg
         ref={containerRef}
         viewBox="0 0 1440 1128"
+        preserveAspectRatio="xMidYMid meet"
         className={`w-full flex-grow select-none bg-slate-100/50 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -199,7 +177,7 @@ export default function IndoorMap({
         {/* Dynamic Zoom & Pan Group wrapper */}
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}>
           
-          {/* Grid lines */}
+          {/* Background Grid Pattern */}
           <defs>
             <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
               <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
@@ -216,7 +194,7 @@ export default function IndoorMap({
               width={c.width * 12}
               height={c.height * 12}
               fill="#F8FAFC"
-              stroke="#E2E8F0"
+              stroke="#CBD5E1"
               strokeWidth="1.5"
             />
           ))}
@@ -225,13 +203,12 @@ export default function IndoorMap({
           {rooms.map((room) => {
             const isStart = currentLocationId === room.id;
             const isEnd = destinationId === room.id;
-            const isSelected = isStart || isEnd || inspectedRoom?.id === room.id;
+            const isInspected = inspectedRoom?.id === room.id;
 
-            // Room dimensions
+            // Room dimensions (scaled 1 unit = 12 pixels)
             const rx = room.coordinates.x * 12;
             const ry = room.coordinates.y * 12;
             
-            // Look up seeded room dimension fields or default
             const rawRoom = locations.find(l => l.id === room.id) as any;
             const rw = (rawRoom?.width || 8.0) * 12;
             const rh = (rawRoom?.height || 10.0) * 12;
@@ -244,6 +221,7 @@ export default function IndoorMap({
                 onMouseEnter={() => setHoveredRoom(room)}
                 onMouseLeave={() => setHoveredRoom(null)}
               >
+                {/* Room Boundary Rect */}
                 <rect
                   x={rx}
                   y={ry}
@@ -252,33 +230,51 @@ export default function IndoorMap({
                   rx="6"
                   className={`transition-all duration-200 ${
                     isStart
-                      ? 'fill-emerald-50 stroke-emerald-600 stroke-3'
+                      ? 'fill-emerald-50 stroke-emerald-600 stroke-[3.5]'
                       : isEnd
-                      ? 'fill-red-50 stroke-red-600 stroke-3'
-                      : inspectedRoom?.id === room.id
-                      ? 'fill-blue-50/80 stroke-blue-600 stroke-3'
-                      : isSelected
-                      ? 'fill-blue-50 stroke-blue-500 stroke-2'
+                      ? 'fill-blue-50 stroke-blue-600 stroke-[3.5]'
+                      : isInspected
+                      ? 'fill-blue-50/70 stroke-blue-500 stroke-2'
                       : 'fill-white stroke-slate-300 stroke-1.5 hover:fill-slate-50 hover:stroke-slate-400'
                   }`}
                 />
                 
-                {/* Room label text */}
+                {/* Centered Room ID Label */}
                 <text
                   x={rx + rw / 2}
                   y={ry + rh / 2}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className={`text-[9px] font-bold transition-colors select-none ${
+                  className={`text-[10px] font-extrabold select-none ${
                     isStart
-                      ? 'fill-emerald-800'
+                      ? 'fill-emerald-900'
                       : isEnd
-                      ? 'fill-red-800'
+                      ? 'fill-blue-900'
                       : 'fill-slate-800 group-hover:fill-blue-600'
                   }`}
                 >
                   {room.id}
                 </text>
+
+                {/* Destination Badge Indicator inside room */}
+                {isEnd && (
+                  <g transform={`translate(${rx + rw - 16}, ${ry + 16})`}>
+                    <circle cx="0" cy="0" r="8" fill="#2563EB" />
+                    <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" className="text-[7px] font-bold">
+                      ★
+                    </text>
+                  </g>
+                )}
+
+                {/* Start Badge Indicator inside room */}
+                {isStart && (
+                  <g transform={`translate(${rx + rw - 16}, ${ry + 16})`}>
+                    <circle cx="0" cy="0" r="8" fill="#10B981" />
+                    <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" className="text-[7px] font-bold">
+                      ●
+                    </text>
+                  </g>
+                )}
               </g>
             );
           })}
@@ -373,9 +369,10 @@ export default function IndoorMap({
             </g>
           ))}
 
-          {/* 7. Route Path Overlay */}
+          {/* 7. Route Path Overlay strictly connecting Door-to-Door along Corridors */}
           {routePathPoints.length > 1 && (
             <g>
+              {/* Outer glowing trace line */}
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
@@ -386,88 +383,31 @@ export default function IndoorMap({
                 strokeDasharray="14, 8"
                 className="animate-[dash_3.5s_linear_infinite]"
               />
+              
+              {/* Inner crisp line */}
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
                 stroke="#60A5FA"
-                strokeWidth="3"
+                strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                opacity="0.9"
+                opacity="0.95"
               />
 
-              {/* Start Coordinate Circle Marker */}
-              <circle
-                cx={routePathPoints[0].x * 12}
-                cy={routePathPoints[0].y * 12}
-                r="11"
-                fill="#10B981"
-                stroke="#FFFFFF"
-                strokeWidth="3"
-              />
+              {/* Start Door Coordinate Indicator Marker */}
+              <g transform={`translate(${routePathPoints[0].x * 12}, ${routePathPoints[0].y * 12})`}>
+                <circle cx="0" cy="0" r="10" fill="#10B981" stroke="#FFFFFF" strokeWidth="2.5" />
+                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+              </g>
 
-              {/* End Coordinate Pin Marker */}
+              {/* Destination Door Coordinate Pin Marker */}
               <g transform={`translate(${routePathPoints[routePathPoints.length - 1].x * 12}, ${routePathPoints[routePathPoints.length - 1].y * 12})`}>
-                <circle cx="0" cy="0" r="11" fill="#EF4444" stroke="#FFFFFF" strokeWidth="3" />
-                <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+                <circle cx="0" cy="0" r="10" fill="#EF4444" stroke="#FFFFFF" strokeWidth="2.5" />
+                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
               </g>
             </g>
           )}
-
-          {/* 8. Pulse Warning Emergency Hazards Overlay */}
-          {hazards.map((h, idx) => {
-            let cx = 0;
-            let cy = 0;
-            let radius = h.radius || 3.0;
-            if (h.type === 'FIRE') radius = 5.0; // 2m + 3m safety zone
-            else if (h.type === 'GAS') radius = 3.0;
-
-            const rect = findElementRect(h.locationId);
-            if (rect) {
-              cx = (rect.x + rect.w / 2) * 12;
-              cy = (rect.y + rect.h / 2) * 12;
-            } else if (waypointMap[h.locationId]) {
-              cx = waypointMap[h.locationId].x * 12;
-              cy = waypointMap[h.locationId].y * 12;
-            } else if (h.x && h.y) {
-              cx = h.x * 12;
-              cy = h.y * 12;
-            } else {
-              return null;
-            }
-
-            const color = h.type === 'FIRE' ? '#EF4444' : h.type === 'GAS' ? '#F59E0B' : h.type === 'BLOCKAGE' ? '#B91C1C' : '#8B5CF6';
-
-            return (
-              <g key={h._id || idx}>
-                {/* Semi-transparent pulsing danger zone */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={radius * 12}
-                  fill={color}
-                  fillOpacity="0.25"
-                  stroke={color}
-                  strokeWidth="2"
-                  strokeDasharray="4, 4"
-                  className="animate-pulse"
-                />
-                
-                {/* Central Warning Badge */}
-                <circle cx={cx} cy={cy} r="10" fill={color} stroke="#FFFFFF" strokeWidth="1.5" />
-                <text
-                  x={cx}
-                  y={cy}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="#FFFFFF"
-                  className="text-[9px] font-extrabold select-none"
-                >
-                  !
-                </text>
-              </g>
-            );
-          })}
 
         </g>
       </svg>
@@ -484,25 +424,22 @@ export default function IndoorMap({
       {/* Legend Tooltip Info Bar */}
       <div className="bg-white border-t border-slate-200 px-4 py-3 flex flex-col md:flex-row items-center justify-between text-xs text-brand-primary gap-2">
         {hoveredRoom ? (
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1.5">
             <Info className="w-3.5 h-3.5 text-brand-secondary" />
-            <span><strong>{hoveredRoom.name}</strong> • Floor {hoveredRoom.floor} • {hoveredRoom.category}</span>
+            <span><strong>{hoveredRoom.id} • {hoveredRoom.name}</strong> (Floor {hoveredRoom.floor} • {hoveredRoom.category})</span>
           </div>
         ) : (
-          <span className="text-brand-muted">Click any room to inspect. Pulse circles indicate active hazard zones.</span>
+          <span className="text-brand-muted">Click any room or door to inspect and navigate.</span>
         )}
         <div className="flex items-center space-x-3 text-brand-muted text-[10px] font-bold uppercase tracking-wider">
           <span className="flex items-center">
-            <MapPin className="w-3 h-3 text-emerald-600 mr-1" /> Start
+            <MapPin className="w-3 h-3 text-emerald-600 mr-1" /> Start Door
           </span>
           <span className="flex items-center">
-            <Navigation className="w-3 h-3 text-red-500 mr-1" /> Dest
+            <Navigation className="w-3 h-3 text-red-500 mr-1" /> Dest Door
           </span>
-          <span className="flex items-center">
-            <span className="w-3 h-3 bg-red-100 border border-red-500 mr-1 rounded-full inline-block animate-pulse"></span> Hazard
-          </span>
-          <span className="flex items-center font-bold text-green-700">
-            [SJT GROUND FLOOR]
+          <span className="flex items-center font-bold text-blue-700">
+            [SJT GROUND FLOOR - 120m × 94m]
           </span>
         </div>
       </div>

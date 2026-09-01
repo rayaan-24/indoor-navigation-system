@@ -42,16 +42,16 @@ const mapDataset = {
     { "id": "G03", "name": "Classroom G03", "department": "SITE", "x": 40.0, "y": 70.0, "width": 10.0, "height": 10.05, "area_sqft": 1052, "area_sqm": 100.5, "capacity": 56 },
     { "id": "G04", "name": "Classroom G04", "department": "SITE", "x": 50.0, "y": 70.0, "width": 8.0, "height": 10.35, "area_sqft": 891, "area_sqm": 82.80026013, "capacity": 46 },
     { "id": "G05", "name": "Classroom G05", "department": "SITE", "x": 62.0, "y": 70.0, "width": 8.0, "height": 10.13, "area_sqft": 872, "area_sqm": 81.01077666, "capacity": 44 },
-    { "id": "G06", "name": "Electrical Room", "department": "", "x": 71.5, "y": 48.0, "width": 4.0, "height": 7.01, "area_sqft": 302, "area_sqm": 28.05648458, "capacity": 4 },
+    { "id": "G06", "name": "Electrical Room", "department": "Facilities", "x": 71.5, "y": 48.0, "width": 4.0, "height": 7.01, "area_sqft": 302, "area_sqm": 28.05648458, "capacity": 4 },
     { "id": "G07", "name": "Smart Classroom", "department": "SITE", "x": 44.0, "y": 48.0, "width": 14.0, "height": 11.51, "area_sqft": 1734, "area_sqm": 161.0925307, "capacity": 90 },
     { "id": "G08", "name": "Classroom G08", "department": "SITE", "x": 62.0, "y": 48.0, "width": 6.8, "height": 8.14, "area_sqft": 596, "area_sqm": 55.36975102, "capacity": 28 },
-    { "id": "G09", "name": "Boys Toilet", "department": "", "x": 100.0, "y": 27.0, "width": 8.0, "height": 8.37, "area_sqft": 721, "area_sqm": 66.98253437, "capacity": 18 },
+    { "id": "G09", "name": "Boys Toilet", "department": "Amenities", "x": 100.0, "y": 27.0, "width": 8.0, "height": 8.37, "area_sqft": 721, "area_sqm": 66.98253437, "capacity": 18 },
     { "id": "G10", "name": "Classroom G10", "department": "SITE", "x": 100.0, "y": 37.5, "width": 7.5, "height": 10.05, "area_sqft": 811, "area_sqm": 75.34373839, "capacity": 40 },
-    { "id": "G11", "name": "Dining Hall G11", "department": "", "x": 22.0, "y": 27.0, "width": 12.0, "height": 13.0, "area_sqft": 1679, "area_sqm": 155.982906, "capacity": 120 },
-    { "id": "G12", "name": "Dining Hall G12", "department": "", "x": 66.0, "y": 27.0, "width": 12.0, "height": 13.0, "area_sqft": 1679, "area_sqm": 155.982906, "capacity": 120 },
-    { "id": "G13", "name": "Canteen Arasan", "department": "", "x": 29.5, "y": 8.5, "width": 28.5, "height": 15.5, "area_sqft": 7620, "area_sqm": 707.9152731, "capacity": 320 },
+    { "id": "G11", "name": "Dining Hall G11", "department": "Amenities", "x": 22.0, "y": 27.0, "width": 12.0, "height": 13.0, "area_sqft": 1679, "area_sqm": 155.982906, "capacity": 120 },
+    { "id": "G12", "name": "Dining Hall G12", "department": "Amenities", "x": 66.0, "y": 27.0, "width": 12.0, "height": 13.0, "area_sqft": 1679, "area_sqm": 155.982906, "capacity": 120 },
+    { "id": "G13", "name": "Canteen Arasan", "department": "Amenities", "x": 29.5, "y": 8.5, "width": 28.5, "height": 15.5, "area_sqft": 7620, "area_sqm": 707.9152731, "capacity": 320 },
     { "id": "G14", "name": "Classroom G14", "department": "SITE", "x": 10.5, "y": 38.0, "width": 7.5, "height": 10.05, "area_sqft": 811, "area_sqm": 75.34373839, "capacity": 40 },
-    { "id": "G15", "name": "Girls Toilet", "department": "", "x": 10.5, "y": 27.0, "width": 7.5, "height": 9.33, "area_sqft": 753, "area_sqm": 69.95540691, "capacity": 18 },
+    { "id": "G15", "name": "Girls Toilet", "department": "Amenities", "x": 10.5, "y": 27.0, "width": 7.5, "height": 9.33, "area_sqft": 753, "area_sqm": 69.95540691, "capacity": 18 },
     { "id": "G16", "name": "Classroom G16", "department": "SITE", "x": 10.0, "y": 59.6, "width": 8.0, "height": 10.4, "area_sqft": 896, "area_sqm": 83.24043107, "capacity": 44 },
     { "id": "G17", "name": "SD & Management Lab", "department": "SITE", "x": 6.0, "y": 47.5, "width": 12.0, "height": 12.75, "area_sqft": 1647, "area_sqm": 153.0100334, "capacity": 70 },
     { "id": "G18", "name": "Embedded & IoT Lab", "department": "SITE", "x": 21.0, "y": 48.0, "width": 9.5, "height": 10.0, "area_sqft": 1023, "area_sqm": 95.03901895, "capacity": 42 },
@@ -59,12 +59,12 @@ const mapDataset = {
     { "id": "G19", "name": "Mobile App Development Lab", "department": "SITE", "x": 72.0, "y": 70.0, "width": 9.5, "height": 10.0, "area_sqft": 1023, "area_sqm": 95.03901895, "capacity": 42 },
     { "id": "G19A", "name": "Automation Lab", "department": "SITE", "x": 83.5, "y": 70.0, "width": 6.0, "height": 9.17, "area_sqft": 592, "area_sqm": 54.99814195, "capacity": 24 },
     { "id": "G20", "name": "Data Science Lab", "department": "SITE", "x": 84.8, "y": 48.0, "width": 12.0, "height": 12.75, "area_sqft": 1647, "area_sqm": 153.0100334, "capacity": 70 },
-    { "id": "G21", "name": "Staff Toilet", "department": "", "x": 79.5, "y": 27.0, "width": 4.0, "height": 9.29, "area_sqft": 400, "area_sqm": 37.16090673, "capacity": 10 },
+    { "id": "G21", "name": "Staff Toilet", "department": "Amenities", "x": 79.5, "y": 27.0, "width": 4.0, "height": 9.29, "area_sqft": 400, "area_sqm": 37.16090673, "capacity": 10 },
     { "id": "G22", "name": "Dean Office", "department": "SITE", "x": 35.0, "y": 27.0, "width": 9.1, "height": 10.0, "area_sqft": 980, "area_sqm": 91.04422148, "capacity": 18 },
     { "id": "G23", "name": "HOD Cabin - SITE", "department": "SITE", "x": 44.6, "y": 27.0, "width": 8.45, "height": 10.0, "area_sqft": 910, "area_sqm": 84.5410628, "capacity": 12 },
     { "id": "G24", "name": "Classroom G24", "department": "SITE", "x": 84.0, "y": 27.0, "width": 8.25, "height": 10.0, "area_sqft": 888, "area_sqm": 82.49721293, "capacity": 44 },
-    { "id": "MISC", "name": "Store", "department": "", "x": 90.0, "y": 70.0, "width": 2.5, "height": 2.97, "area_sqft": 80, "area_sqm": 7.432181345, "capacity": 4 },
-    { "id": "G26", "name": "Janitor's Store", "department": "", "x": 94.0, "y": 70.0, "width": 1.5, "height": 1.86, "area_sqft": 30, "area_sqm": 2.787068004, "capacity": 2 }
+    { "id": "MISC", "name": "Store", "department": "Facilities", "x": 90.0, "y": 70.0, "width": 2.5, "height": 2.97, "area_sqft": 80, "area_sqm": 7.432181345, "capacity": 4 },
+    { "id": "G26", "name": "Janitor's Store", "department": "Facilities", "x": 94.0, "y": 70.0, "width": 1.5, "height": 1.86, "area_sqft": 30, "area_sqm": 2.787068004, "capacity": 2 }
   ],
   "corridors": [
     { "id": "C1A", "name": "C1-1_Main_Corridor_North_Upper", "x": 58.0, "y": 16.0, "width": 4.0, "height": 8.0 },
@@ -161,6 +161,7 @@ const mapDataset = {
     { "id": "WP_S1", "x": 23.0, "y": 12.0, "label": "North West Stair" },
     { "id": "WP_S2", "x": 95.0, "y": 12.0, "label": "North East Stair" },
     { "id": "WP_S3", "x": 60.0, "y": 90.0, "label": "South Stair" },
+    { "id": "WP_L1", "x": 60.0, "y": 39.0, "label": "Central Lift Lobby" },
     { "id": "WP_E3", "x": 109.0, "y": 59.0, "label": "East Side Exit Lobby" },
     { "id": "WP_G01", "x": 22.0, "y": 68.5, "label": "Door G01" },
     { "id": "WP_G02", "x": 31.5, "y": 68.5, "label": "Door G02" },
@@ -192,74 +193,85 @@ const mapDataset = {
     { "id": "WP_MISC", "x": 89.5, "y": 68.5, "label": "Door MISC" },
     { "id": "WP_C3C_South", "x": 98.5, "y": 67.0, "label": "C3C South Entry" }
   ],
+  // Valid, physically continuous corridor edges strictly connecting adjacent consecutive nodes along corridor lines
   "graph_edges": [
-    ["J_NW", "WP_C4_W", 20.5],
-    ["WP_C4_W", "J_NC", 20.0],
-    ["J_NC", "WP_C4_E", 20.0],
-    ["WP_C4_E", "J_NE", 18.5],
-    ["J_MW", "WP_C5_W", 20.5],
-    ["WP_C5_W", "J_MC", 20.0],
-    ["J_MC", "WP_C5_E", 20.0],
-    ["WP_C5_E", "J_ME", 18.5],
-    ["J_SW", "WP_C6_W", 20.5],
-    ["WP_C6_W", "J_SC", 20.0],
-    ["J_SC", "WP_C6_E", 20.0],
-    ["WP_C6_E", "J_SE", 18.5],
-    ["J_NW", "J_MW", 21.0],
-    ["J_MW", "J_SW", 22.0],
-    ["J_NC", "J_MC", 21.0],
-    ["J_NC", "J_NE", 38.5],
-    ["J_MC", "J_SC", 22.0],
-    ["J_NE", "J_ME", 21.0],
-    ["J_ME", "J_SE", 22.0],
-    ["J_SE", "WP_C3C_South", 1.5],
-    ["WP_C3C_South", "J_ME", 20.5],
-    ["WP_C3C_South", "WP_E3", 13.2],
-    ["J_NW", "WP_S1", 13.5],
-    ["J_NE", "WP_S2", 13.5],
-    ["J_SC", "WP_S3", 21.5],
-    ["J_ME", "WP_E3", 16.5],
-    ["WP_S1", "E1", 5.0],
-    ["WP_S2", "E2", 5.0],
-    ["WP_S3", "E4", 3.0],
-    ["WP_E3", "E3", 1.0],
-    ["WP_G01", "J_SW", 2.5],
-    ["WP_G02", "J_SC", 28.5],
-    ["WP_G02", "J_SW", 12.0],
-    ["WP_G03", "J_SC", 18.0],
-    ["WP_G04", "J_SC", 8.5],
-    ["WP_G05", "J_SC", 7.0],
-    ["WP_G06", "WP_C5_E", 7.5],
-    ["WP_G06", "J_MC", 12.5],
-    ["WP_G07", "J_MC", 11.0],
-    ["WP_G08", "J_MC", 6.0],
-    ["WP_G09", "J_NE", 5.5],
-    ["WP_G10", "J_ME", 4.5],
-    ["WP_G11", "J_NW", 8.5],
-    ["WP_G12", "WP_C4_E", 8.0],
-    ["WP_G12", "J_NC", 12.0],
-    ["WP_G13", "J_NC", 10.2],
-    ["WP_G14", "J_MW", 3.5],
-    ["WP_G14", "J_NW", 17.5],
-    ["WP_G15", "J_NW", 6.5],
-    ["WP_G15", "J_MW", 14.5],
-    ["WP_G16", "J_SW", 6.5],
-    ["WP_G16", "J_NW", 36.5],
-    ["WP_G17", "J_MW", 8.5],
-    ["WP_G17", "J_SW", 13.5],
-    ["WP_G18", "J_MW", 6.5],
-    ["WP_G18A", "WP_C5_W", 5.5],
-    ["WP_G18A", "J_MC", 25.5],
-    ["WP_G19", "WP_C6_E", 3.2],
-    ["WP_G19", "J_SC", 16.8],
-    ["WP_G19A", "WP_C6_E", 5.0],
-    ["WP_G20", "J_ME", 8.5],
-    ["WP_G21", "WP_C4_E", 1.5],
+    // 1. North Corridor West (y = 25.5)
+    ["J_NW", "WP_G11", 8.5],
+    ["WP_G11", "WP_G22", 11.5],
     ["WP_G22", "WP_C4_W", 0.5],
-    ["WP_G23", "J_NC", 11.8],
+    ["WP_C4_W", "WP_G23", 8.2],
+    ["WP_G23", "WP_G13", 1.6],
+    ["WP_G13", "J_NC", 10.2],
+
+    // 2. North Corridor East (y = 25.5)
+    ["J_NC", "WP_G12", 12.0],
+    ["WP_G12", "WP_C4_E", 8.0],
+    ["WP_C4_E", "WP_G21", 1.5],
+    ["WP_G21", "WP_G24", 6.5],
     ["WP_G24", "J_NE", 10.5],
+
+    // 3. Central Corridor West (y = 46.5)
+    ["J_MW", "WP_G18", 6.5],
+    ["WP_G18", "WP_G18A", 8.5],
+    ["WP_G18A", "WP_C5_W", 5.5],
+    ["WP_C5_W", "WP_G07", 9.0],
+    ["WP_G07", "J_MC", 11.0],
+
+    // 4. Central Corridor East (y = 46.5)
+    ["J_MC", "WP_G08", 6.0],
+    ["WP_G08", "WP_G06", 6.5],
+    ["WP_G06", "WP_C5_E", 7.5],
+    ["WP_C5_E", "WP_G20", 10.0],
+    ["WP_G20", "J_ME", 8.5],
+
+    // 5. South Corridor West (y = 68.5)
+    ["J_SW", "WP_G01", 2.5],
+    ["WP_G01", "WP_G02", 9.5],
+    ["WP_G02", "WP_C6_W", 8.5],
+    ["WP_C6_W", "WP_G03", 2.0],
+    ["WP_G03", "WP_G04", 9.5],
+    ["WP_G04", "J_SC", 8.5],
+
+    // 6. South Corridor East (y = 68.5)
+    ["J_SC", "WP_G05", 7.0],
+    ["WP_G05", "WP_G19", 9.8],
+    ["WP_G19", "WP_C6_E", 3.2],
+    ["WP_C6_E", "WP_G19A", 5.0],
+    ["WP_G19A", "WP_MISC", 4.5],
+    ["WP_MISC", "WP_G26", 2.5],
     ["WP_G26", "J_SE", 6.5],
-    ["WP_MISC", "J_SE", 9.0]
+
+    // 7. Left Wing Vertical Corridor (x = 19.5)
+    ["J_NW", "WP_G15", 6.5],
+    ["WP_G15", "WP_G14", 11.0],
+    ["WP_G14", "J_MW", 3.5],
+    ["J_MW", "WP_G17", 8.5],
+    ["WP_G17", "WP_G16", 7.0],
+    ["WP_G16", "J_SW", 6.5],
+
+    // 8. Central Vertical Core (x = 60.0)
+    ["J_NC", "WP_L1", 13.5],
+    ["WP_L1", "J_MC", 7.5],
+    ["J_MC", "J_SC", 22.0],
+
+    // 9. Right Wing Vertical Corridor (x = 98.5)
+    ["J_NE", "WP_G09", 5.5],
+    ["WP_G09", "WP_G10", 11.0],
+    ["WP_G10", "J_ME", 4.5],
+    ["J_ME", "WP_C3C_South", 20.5],
+    ["WP_C3C_South", "J_SE", 1.5],
+
+    // 10. Vertical Egress, Stairs, Lifts and Exits
+    ["J_NW", "WP_S1", 13.9],
+    ["WP_S1", "E1", 5.4],
+    ["J_NE", "WP_S2", 13.9],
+    ["WP_S2", "E2", 2.2],
+    ["J_SC", "WP_S3", 21.5],
+    ["WP_S3", "E4", 2.8],
+    ["J_ME", "WP_E3", 16.3],
+    ["WP_C3C_South", "WP_E3", 13.2],
+    ["WP_E3", "E3", 2.2],
+    ["WP_L1", "L1", 6.0]
   ],
   "sensor_map": {
     "sensor_0": "C1A",
@@ -363,7 +375,8 @@ const mapDataset = {
       { "corridor_id": "C7A", "stair_id": "S1", "waypoint_id": "WP_S1" },
       { "corridor_id": "C7B", "stair_id": "S2", "waypoint_id": "WP_S2" },
       { "corridor_id": "C1D", "stair_id": "S3", "waypoint_id": "WP_S3" },
-      { "corridor_id": "C7C", "stair_id": "E3", "waypoint_id": "WP_E3" }
+      { "corridor_id": "C7C", "stair_id": "E3", "waypoint_id": "WP_E3" },
+      { "corridor_id": "C1B", "lift_id": "L1", "waypoint_id": "WP_L1" }
     ],
     "stairs_to_exits": [
       { "stair_id": "S1", "exit_id": "E1" },
@@ -424,7 +437,7 @@ const seedDatabase = async () => {
     const buildingData = {
       name: mapDataset.building.name,
       code: 'sjt-ground',
-      description: 'SJT Ground Floor - Metric Layout layout with classrooms, labs, toilets, stairs, elevators and corridors.',
+      description: 'SJT Ground Floor - Metric Layout with classrooms, labs, toilets, stairs, elevators and corridors.',
       numberOfFloors: 1,
       numberOfLocations: mapDataset.rooms.length,
       facilities: ['Smartboards', 'A/C Classrooms', 'Elevators', 'Emergency Exits'],
@@ -609,7 +622,7 @@ const seedDatabase = async () => {
         floorId: floor._id,
         type: 'corridor_to_vertical_egress',
         fromId: conn.corridor_id,
-        toId: conn.stair_id || conn.exit_id, // can be stair or exit (e.g. E3 is in egress list)
+        toId: conn.stair_id || conn.exit_id || conn.lift_id,
         waypointId: conn.waypoint_id
       });
     });
@@ -645,9 +658,12 @@ const seedDatabase = async () => {
       waypointsMap[w.id] = { x: w.x, y: w.y };
     });
 
-    // Also include exits in waypoints coordinates for edges connecting directly to exits (like WP_S1 -> E1)
+    // Also include exits and lifts in waypoints coordinates for edges
     mapDataset.exits.forEach(e => {
       waypointsMap[e.id] = { x: e.x, y: e.y };
+    });
+    mapDataset.lifts.forEach(l => {
+      waypointsMap[l.id] = { x: l.x, y: l.y };
     });
 
     // Determine type and accessibility of edge endpoints
@@ -665,7 +681,7 @@ const seedDatabase = async () => {
         return { type: 'elevator', accessibility: true };
       }
       // Door connection
-      if (f.startsWith('wp_g') || t.startsWith('wp_g')) {
+      if (f.startsWith('wp_g') || t.startsWith('wp_g') || f.startsWith('wp_misc') || t.startsWith('wp_misc')) {
         return { type: 'door', accessibility: true };
       }
       return { type: 'corridor', accessibility: true };
@@ -676,10 +692,15 @@ const seedDatabase = async () => {
       const fromCoords = waypointsMap[fromNode] || { x: 0, y: 0 };
       const toCoords = waypointsMap[toNode] || { x: 0, y: 0 };
 
+      // Calculate exact Euclidean distance if not supplied
+      const calcDist = distance !== undefined && distance > 0 
+        ? distance 
+        : Math.round(Math.hypot(toCoords.x - fromCoords.x, toCoords.y - fromCoords.y) * 10) / 10;
+
       connectionsToInsert.push({
         fromNode,
         toNode,
-        distance,
+        distance: calcDist,
         type,
         accessibility,
         floor: 0,
@@ -691,7 +712,7 @@ const seedDatabase = async () => {
     const seededConnections = await Connection.insertMany(connectionsToInsert);
     console.log(`Seeded ${seededConnections.length} Active Graph Edge Connections.`);
 
-    // 15. Create a couple of demo feedback items
+    // 15. Create demo feedback items
     const demoFeedbacks = [
       {
         issueType: 'Incorrect room',

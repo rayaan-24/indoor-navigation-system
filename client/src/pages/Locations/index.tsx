@@ -100,6 +100,7 @@ export default function Locations() {
   const filteredLocations = useMemo(() => {
     return combinedLocations.filter((loc) => {
       const matchesSearch =
+        (loc.id && loc.id.toLowerCase().includes(searchQuery.toLowerCase())) ||
         loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.description.toLowerCase().includes(searchQuery.toLowerCase());

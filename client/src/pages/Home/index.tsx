@@ -28,7 +28,7 @@ export default function Home() {
 
         if (rRes.success) {
           const allRooms = rRes.data;
-          const popularCodes = ['b-comp-lab-204', 'a-central-library', 'a-auditorium', 'b-cafeteria', 'c-admin-office'];
+          const popularCodes = ['G07', 'G01', 'G13', 'G18', 'G20', 'G02'];
           
           const filteredPopular: Location[] = allRooms
             .filter((r: any) => popularCodes.includes(r.roomNumber))
@@ -80,8 +80,8 @@ export default function Home() {
     }
   };
 
-  const handleSuggestionClick = (locName: string) => {
-    navigate(`/explore?to=${encodeURIComponent(locName)}`);
+  const handleSuggestionClick = (loc: any) => {
+    navigate(`/explore?to=${encodeURIComponent(loc.roomNumber || loc.name)}`);
   };
 
   return (
@@ -136,18 +136,25 @@ export default function Home() {
 
               {/* Autocomplete suggestions dropdown */}
               {suggestions.length > 0 && (
-                <div className="absolute left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-55 overflow-hidden animate-fade-in">
+                <div className="absolute left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-55 overflow-hidden animate-fade-in divide-y divide-slate-100">
                   {suggestions.map((loc) => (
                     <button
                       key={loc.id}
                       type="button"
-                      onClick={() => handleSuggestionClick(loc.name)}
-                      className="w-full px-4 py-3 hover:bg-slate-50 text-left flex items-center justify-between border-b border-slate-100 last:border-0 cursor-pointer"
+                      onClick={() => handleSuggestionClick(loc)}
+                      className="w-full px-4 py-3 hover:bg-slate-50 text-left flex items-center justify-between transition-colors cursor-pointer"
                     >
                       <div>
-                        <p className="text-xs font-bold text-brand-primary">{loc.name}</p>
-                        <p className="text-[10px] text-brand-muted uppercase tracking-wider mt-0.5">
-                          {loc.building} • Floor {loc.floorNumber === 0 ? 'Ground' : `${loc.floorNumber}`}
+                        <div className="flex items-center space-x-2">
+                          {loc.roomNumber && (
+                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 font-extrabold text-[10px] rounded">
+                              {loc.roomNumber}
+                            </span>
+                          )}
+                          <p className="text-xs font-bold text-brand-primary">{loc.name}</p>
+                        </div>
+                        <p className="text-[10px] text-brand-muted mt-0.5">
+                          {loc.building} • Floor {loc.floorNumber === 0 ? 'Ground' : `${loc.floorNumber}`} {loc.department ? `• ${loc.department}` : ''}
                         </p>
                       </div>
                       <span className="text-[9px] font-bold text-brand-secondary bg-blue-50 px-2 py-0.5 rounded-full capitalize">

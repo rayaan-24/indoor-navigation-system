@@ -1,4 +1,5 @@
 const { buildGraph } = require('./graphService');
+const { segmentCrossesRoom, validateRouteGeometry } = require('./routeGeometryValidator');
 const Room = require('../models/Room');
 const Landmark = require('../models/Landmark');
 const Waypoint = require('../models/Waypoint');
@@ -7,40 +8,34 @@ const Exit = require('../models/Exit');
 const Hazard = require('../models/Hazard');
 const Door = require('../models/Door');
 
-// Configurable walking speed: 1.2 meters per second (average human pace)
+// Average walking pace: 1.2 meters/second (~72 meters/minute)
 const WALKING_SPEED_MPS = 1.2;
 
 /**
- * Resolves a given room ID or landmark ID to its entry waypoint ID.
+ * Resolves a given room ID or landmark ID to its corridor door entry waypoint ID.
  */
 const resolveToWaypointId = async (id) => {
-  // If it's already a waypoint, return it
+  if (!id) return id;
+
+  // 1. Direct waypoint check
   const wp = await Waypoint.findOne({ waypointId: id });
   if (wp) return id;
 
-  // Find room_to_corridor logical connection
+  // 2. Direct Door check
+  const door = await Door.findOne({ doorId: id });
+  if (door) {
+    const doorConn = await LogicalConnection.findOne({ doorId: door.doorId, type: 'room_to_corridor' });
+    if (doorConn && doorConn.waypointId) return doorConn.waypointId;
+  }
+
+  // 3. Room to corridor connection by room number (e.g. "G01", "G07")
   const conn = await LogicalConnection.findOne({ fromId: id, type: 'room_to_corridor' });
   if (conn && conn.waypointId) {
     return conn.waypointId;
   }
 
-  // Check if it's an exit
-  const exitConn = await LogicalConnection.findOne({ toId: id, type: 'corridor_to_vertical_egress' });
-  if (exitConn && exitConn.waypointId) {
-    return exitConn.waypointId;
-  }
-
-  const exitStairConn = await LogicalConnection.findOne({ fromId: id, type: 'stairs_to_exits' });
-  if (exitStairConn) {
-    // Find stair connector
-    const stairConn = await LogicalConnection.findOne({ toId: id, type: 'corridor_to_vertical_egress' });
-    if (stairConn && stairConn.waypointId) {
-      return stairConn.waypointId;
-    }
-  }
-
-  // Fallback Room lookups
-  const room = await Room.findOne({ roomNumber: id });
+  // 4. Room lookup by MongoDB ObjectId or roomNumber
+  const room = (id.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(id) : null) || await Room.findOne({ roomNumber: id });
   if (room) {
     const roomConn = await LogicalConnection.findOne({ fromId: room.roomNumber, type: 'room_to_corridor' });
     if (roomConn && roomConn.waypointId) {
@@ -48,39 +43,26 @@ const resolveToWaypointId = async (id) => {
     }
   }
 
+  // 5. Exit or Egress check
+  const exitConn = await LogicalConnection.findOne({ toId: id, type: 'corridor_to_vertical_egress' });
+  if (exitConn && exitConn.waypointId) {
+    return exitConn.waypointId;
+  }
+
+  const exitStairConn = await LogicalConnection.findOne({ fromId: id, type: 'stairs_to_exits' });
+  if (exitStairConn) {
+    const stairConn = await LogicalConnection.findOne({ toId: id, type: 'corridor_to_vertical_egress' });
+    if (stairConn && stairConn.waypointId) {
+      return stairConn.waypointId;
+    }
+  }
+
   return id;
 };
 
-const isPointInRect = (px, py, rx, ry, rw, rh) => {
-  const EPSILON = 0.1; // tolerance
-  return px > rx + EPSILON && px < rx + rw - EPSILON && py > ry + EPSILON && py < ry + rh - EPSILON;
-};
-
-const lineSegmentsIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
-  const u_b = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-  if (u_b === 0) return false;
-  const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / u_b;
-  const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / u_b;
-  return (ua >= 0 && ua <= 1) && (ub >= 0 && ub <= 1);
-};
-
-const lineIntersectsRect = (x1, y1, x2, y2, rx, ry, rw, rh) => {
-  if (isPointInRect(x1, y1, rx, ry, rw, rh) || isPointInRect(x2, y2, rx, ry, rw, rh)) {
-    return true;
-  }
-  const x3 = rx, y3 = ry;
-  const x4 = rx + rw, y4 = ry;
-  const x5 = rx, y5 = ry + rh;
-  const x6 = rx + rw, y6 = ry + rh;
-
-  return (
-    lineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) ||
-    lineSegmentsIntersect(x1, y1, x2, y2, x3, y3, x5, y5) ||
-    lineSegmentsIntersect(x1, y1, x2, y2, x4, y4, x6, y6) ||
-    lineSegmentsIntersect(x1, y1, x2, y2, x5, y5, x6, y6)
-  );
-};
-
+/**
+ * Validates path geometry against all rooms in the building.
+ */
 const validatePathGeometry = async (path, sourceRoomId, destRoomId) => {
   const rooms = await Room.find({ isActive: true });
   const waypoints = await Waypoint.find({});
@@ -96,7 +78,7 @@ const validatePathGeometry = async (path, sourceRoomId, destRoomId) => {
 
   const getRoomNumber = async (id) => {
     if (!id) return null;
-    const r = await Room.findOne({ roomNumber: id }) || (id.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(id) : null);
+    const r = (id.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(id) : null) || await Room.findOne({ roomNumber: id });
     return r ? r.roomNumber : id;
   };
   
@@ -117,13 +99,8 @@ const validatePathGeometry = async (path, sourceRoomId, destRoomId) => {
         continue;
       }
 
-      const rx = room.coordinates.x;
-      const ry = room.coordinates.y;
-      const rw = room.width || 8.0;
-      const rh = room.height || 10.0;
-
-      if (lineIntersectsRect(p1.x, p1.y, p2.x, p2.y, rx, ry, rw, rh)) {
-        return { u, v };
+      if (segmentCrossesRoom(p1.x, p1.y, p2.x, p2.y, room)) {
+        return { u, v, violatingRoom: room.roomNumber };
       }
     }
   }
@@ -132,7 +109,7 @@ const validatePathGeometry = async (path, sourceRoomId, destRoomId) => {
 };
 
 /**
- * Dijkstra's shortest path calculator.
+ * Dijkstra shortest path algorithm.
  */
 const runDijkstra = (graph, startNode, endNode) => {
   const distances = {};
@@ -140,7 +117,6 @@ const runDijkstra = (graph, startNode, endNode) => {
   const visited = new Set();
   const queue = [];
 
-  // Initialize
   for (const node in graph) {
     distances[node] = Infinity;
     previous[node] = null;
@@ -149,12 +125,11 @@ const runDijkstra = (graph, startNode, endNode) => {
   queue.push({ node: startNode, dist: 0 });
 
   while (queue.length > 0) {
-    // Sort queue by distance (greedy)
     queue.sort((a, b) => a.dist - b.dist);
     const { node: currNode } = queue.shift();
 
     if (currNode === endNode) {
-      break; // Destination found
+      break;
     }
 
     if (visited.has(currNode)) continue;
@@ -174,7 +149,6 @@ const runDijkstra = (graph, startNode, endNode) => {
     }
   }
 
-  // Reconstruct path nodes sequence
   const path = [];
   let curr = endNode;
   while (curr) {
@@ -184,14 +158,14 @@ const runDijkstra = (graph, startNode, endNode) => {
   path.reverse();
 
   if (path[0] !== startNode) {
-    return { path: [], distance: Infinity }; // No path available
+    return { path: [], distance: Infinity };
   }
 
   return { path, distance: distances[endNode] };
 };
 
 /**
- * Maps Dijkstra nodes to routes response schema.
+ * Maps Dijkstra node path into a clean door-to-door corridor route response.
  */
 const compileRouteDetails = async (graph, path, totalDistance, startNodeId, endNodeId) => {
   const pathPoints = {};
@@ -199,108 +173,87 @@ const compileRouteDetails = async (graph, path, totalDistance, startNodeId, endN
   const floorTransitions = [];
 
   // Fetch start/end room documents
-  const startRoom = await Room.findOne({ roomNumber: startNodeId }) || (startNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(startNodeId) : null) || await Landmark.findById(startNodeId);
-  const endRoom = await Room.findOne({ roomNumber: endNodeId }) || (endNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(endNodeId) : null) || await Landmark.findById(endNodeId) || await Exit.findOne({ exitId: endNodeId });
+  const startRoom = (startNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(startNodeId) : null) || await Room.findOne({ roomNumber: startNodeId }) || await Landmark.findById(startNodeId);
+  const endRoom = (endNodeId.match(/^[0-9a-fA-F]{24}$/) ? await Room.findById(endNodeId) : null) || await Room.findOne({ roomNumber: endNodeId }) || await Landmark.findById(endNodeId) || await Exit.findOne({ exitId: endNodeId });
 
-  // Helper to get room center and door center coordinates
-  const getRoomEntryPoints = async (room) => {
-    if (!room || !room.roomNumber) return null;
-    const conn = await LogicalConnection.findOne({ fromId: room.roomNumber, type: 'room_to_corridor' });
-    if (!conn) return null;
-    const door = await Door.findOne({ doorId: conn.doorId });
-    if (!door) return null;
-    
-    const rx = room.coordinates.x;
-    const ry = room.coordinates.y;
-    const rw = room.width || 8.0;
-    const rh = room.height || 10.0;
-    
-    // Room center
-    const rc = { x: rx + rw / 2, y: ry + rh / 2 };
-    // Door center
-    const dc = { x: door.x + (door.width || 1.0) / 2, y: door.y + (door.height || 1.0) / 2 };
-    
-    return { rc, dc };
-  };
+  // Waypoints coordinate mapping
+  const waypoints = await Waypoint.find({});
+  const exits = await Exit.find({});
+  const wpMap = {};
+  const wpLabelMap = {};
 
-  const startEntry = await getRoomEntryPoints(startRoom);
-  const endEntry = await getRoomEntryPoints(endRoom);
+  waypoints.forEach(w => {
+    wpMap[w.waypointId] = { x: w.x, y: w.y };
+    wpLabelMap[w.waypointId] = w.label || w.waypointId;
+  });
+  exits.forEach(e => {
+    wpMap[e.exitId] = { x: e.x, y: e.y };
+    wpLabelMap[e.exitId] = e.name || e.exitId;
+  });
+
+  // 1. Build coordinate polyline: strictly from Source Door Waypoint to Destination Door Waypoint
+  pathPoints[0] = path.map(nodeId => wpMap[nodeId]).filter(Boolean);
+
+  // 2. Generate Step-by-Step Directions
+  const startName = startRoom ? startRoom.name : startNodeId;
+  const endName = endRoom ? endRoom.name : endNodeId;
 
   steps.push({
-    instruction: `Depart from ${startRoom ? startRoom.name : startNodeId}.`,
+    instruction: `Depart from the entrance of ${startName}.`,
     type: 'straight',
     floor: 0
   });
-
-  pathPoints[0] = [];
-
-  // 1. Prepend starting room points: Room Center -> Door Center
-  if (startEntry) {
-    pathPoints[0].push(startEntry.rc);
-    pathPoints[0].push(startEntry.dc);
-  }
 
   for (let i = 0; i < path.length - 1; i++) {
     const u = path[i];
     const v = path[i + 1];
 
-    const neighbor = (graph[u] || []).find((n) => n.node === v);
-    if (!neighbor) continue;
+    const p1 = wpMap[u];
+    const p2 = wpMap[v];
+    const segDist = p1 && p2 ? Math.round(Math.hypot(p2.x - p1.x, p2.y - p1.y) * 10) / 10 : 0;
 
-    const edge = neighbor.details;
-    const edgeFloor = edge.floor !== undefined ? edge.floor : 0;
-    
-    if (!pathPoints[edgeFloor]) {
-      pathPoints[edgeFloor] = [];
-    }
-    
-    // Add pathPoints coordinates (reversing if traversed in the opposite direction of database seeding)
-    let points = [...edge.pathPoints];
-    if (edge.fromNode === v && edge.toNode === u) {
-      points.reverse();
-    }
-    points.forEach((p) => {
-      pathPoints[edgeFloor].push({ x: p.x, y: p.y });
-    });
-
-    // Generate directional guide instructions
+    let stepText = `Walk ${Math.round(segDist)} meters along the corridor.`;
     let directionType = 'straight';
-    let stepText = `Walk ${Math.round(edge.distance)} meters through the corridor.`;
-    
-    if (edge.type === 'stairs') {
+
+    if (v.startsWith('J_')) {
+      stepText = `Continue ${Math.round(segDist)}m toward ${wpLabelMap[v] || 'corridor junction'}.`;
+    } else if (v.startsWith('WP_S')) {
       directionType = 'up-stairs';
-      stepText = `Take the staircase toward exit.`;
-    } else if (edge.type === 'elevator') {
+      stepText = `Head ${Math.round(segDist)}m toward ${wpLabelMap[v] || 'staircase'}.`;
+    } else if (v.startsWith('E') || v === 'WP_E3') {
+      stepText = `Proceed ${Math.round(segDist)}m toward exit doorway.`;
+    } else if (v.startsWith('WP_L') || v === 'L1') {
       directionType = 'elevator';
-      stepText = `Use elevator to transit.`;
-    } else if (edge.type === 'door') {
-      stepText = `Pass through the door doorway entrance.`;
+      stepText = `Proceed ${Math.round(segDist)}m to elevator.`;
+    } else if (i === path.length - 2) {
+      stepText = `Approach entrance of ${endName}.`;
     }
 
     steps.push({
       instruction: stepText,
       type: directionType,
-      floor: edgeFloor
+      floor: 0
     });
   }
 
-  // 2. Append destination room points: Door Center -> Room Center
-  if (endEntry) {
-    pathPoints[0].push(endEntry.dc);
-    pathPoints[0].push(endEntry.rc);
-  }
-
   steps.push({
-    instruction: `Arrive at ${endRoom ? endRoom.name : endNodeId}. Destination is ahead.`,
+    instruction: `Arrive at the entrance of ${endName}. Destination is directly ahead.`,
     type: 'destination',
     floor: 0
   });
 
-  // Calculate ETA in minutes
-  const estimatedTime = Math.ceil(totalDistance / (WALKING_SPEED_MPS * 60));
+  // Calculate true Euclidean path distance if totalDistance is not provided
+  let calculatedDistance = 0;
+  for (let i = 0; i < pathPoints[0].length - 1; i++) {
+    const p1 = pathPoints[0][i];
+    const p2 = pathPoints[0][i + 1];
+    calculatedDistance += Math.hypot(p2.x - p1.x, p2.y - p1.y);
+  }
+  const finalDistance = Math.round(calculatedDistance || totalDistance);
+  const estimatedTime = Math.max(1, Math.ceil(finalDistance / (WALKING_SPEED_MPS * 60)));
 
   return {
-    distance: Math.round(totalDistance),
+    distance: finalDistance,
     estimatedTime,
     steps,
     pathPoints,
@@ -317,6 +270,10 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
   // 1. Resolve architectural identifiers to waypoint nodes
   const startWp = await resolveToWaypointId(sourceId);
   const endWp = await resolveToWaypointId(destinationId);
+
+  if (!startWp || !endWp) {
+    throw new Error('Could not resolve starting or destination location door waypoints.');
+  }
 
   // 2. Build adjacency list graph from database (filtering hazards)
   const graph = await buildGraph(avoidStairs);
@@ -359,7 +316,7 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
     destinationId
   );
 
-  // 5. Calculate alternative route if there are more than 3 nodes in the path
+  // 5. Calculate alternative route if path is long enough
   const alternativeRoutes = [];
   if (primaryResult.path.length > 3) {
     try {
@@ -367,14 +324,9 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
       const u = primaryResult.path[middleIdx - 1];
       const v = primaryResult.path[middleIdx];
 
-      // Clone graph and remove the middle edge to find an alternative
       const altGraph = JSON.parse(JSON.stringify(graph));
-      if (altGraph[u]) {
-        altGraph[u] = altGraph[u].filter((n) => n.node !== v);
-      }
-      if (altGraph[v]) {
-        altGraph[v] = altGraph[v].filter((n) => n.node !== u);
-      }
+      if (altGraph[u]) altGraph[u] = altGraph[u].filter(n => n.node !== v);
+      if (altGraph[v]) altGraph[v] = altGraph[v].filter(n => n.node !== u);
 
       let altAttempts = 0;
       let altResult = { path: [], distance: Infinity };
@@ -385,10 +337,9 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
 
         const invalidAltEdge = await validatePathGeometry(altResult.path, sourceId, destinationId);
         if (!invalidAltEdge) {
-          break; // Valid alt route found!
+          break;
         }
 
-        // Prune the invalid alt edge
         const { u: au, v: av } = invalidAltEdge;
         if (altGraph[au]) altGraph[au] = altGraph[au].filter(n => n.node !== av);
         if (altGraph[av]) altGraph[av] = altGraph[av].filter(n => n.node !== au);
@@ -423,18 +374,12 @@ const calculateRoute = async (sourceId, destinationId, preferences = {}) => {
 
 /**
  * Emergency Evacuation Route Planner.
- * Computes shortest safe path to the nearest reachable exit, avoiding blocking hazards.
  */
 const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
   const { avoidStairs } = preferences;
-
-  // 1. Resolve start location to waypoint
   const startWp = await resolveToWaypointId(sourceId);
-
-  // 2. Build graph with active hazards filtered out
   const graph = await buildGraph(avoidStairs);
 
-  // 3. Define target exit waypoints based on SJT Ground Floor connections
   const exitWaypoints = [
     { exitId: 'E1', wpId: 'WP_S1', name: 'North West Exit' },
     { exitId: 'E2', wpId: 'WP_S2', name: 'North East Exit' },
@@ -446,7 +391,6 @@ const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
   let shortestDistance = Infinity;
   let bestPath = [];
 
-  // 4. Test Dijkstra path to each exit waypoint with validation
   for (const exit of exitWaypoints) {
     let attempts = 0;
     const maxAttempts = 5;
@@ -459,10 +403,9 @@ const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
 
       const invalidEdge = await validatePathGeometry(pathResult.path, sourceId, exit.exitId);
       if (!invalidEdge) {
-        break; // Valid route to this exit found!
+        break;
       }
 
-      // Prune
       const { u, v } = invalidEdge;
       if (graphClone[u]) graphClone[u] = graphClone[u].filter(n => n.node !== v);
       if (graphClone[v]) graphClone[v] = graphClone[v].filter(n => n.node !== u);
@@ -480,7 +423,6 @@ const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
     throw new Error('No safe route is currently available. All exits are blocked.');
   }
 
-  // 5. Compile route details
   const routeDetails = await compileRouteDetails(
     graph,
     bestPath,
@@ -489,7 +431,6 @@ const calculateEvacuationRoute = async (sourceId, preferences = {}) => {
     bestExit.exitId
   );
 
-  // 6. Gather active hazards that were avoided by this path
   const activeHazards = await Hazard.find({ isActive: true });
   const hazardsAvoided = activeHazards.map(h => h.type + ' at ' + h.locationId);
 

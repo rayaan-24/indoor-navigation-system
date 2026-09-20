@@ -186,3 +186,4 @@ The database seeder configures the following login credentials:
 1. **Normal Path Calculation**: Path correctly generated routing from SJT Room `G01` to SJT Room `G25`. Returns correct steps list and estimated time.
 2. **Emergency Evacuation path**: Activating a hazard in a corridor segment automatically recalculates Dijkstra routes through safety detours, routing the user to the nearest open building exit.
 3. **No-Route Recovery**: If disconnected locations are searched, returns a structured error: `No available route found.`
+

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Building2, Filter, Eye, Navigation, RotateCcw, AlertCircle } from 'lucide-react';
+import { Search, Building2, Filter, Eye, Navigation, RotateCcw, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { getBuildings } from '../../services/buildingService';
 import { getRooms } from '../../services/roomService';
 import { getLandmarks } from '../../services/landmarkService';
@@ -15,6 +15,9 @@ export default function Locations() {
   const [selectedBuilding, setSelectedBuilding] = useState('all');
   const [selectedFloor, setSelectedFloor] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  
+  const [isExpanded, setIsExpanded] = useState(false);
+  const INITIAL_LIMIT = 6;
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -112,6 +115,12 @@ export default function Locations() {
       return matchesSearch && matchesBuilding && matchesFloor && matchesCategory;
     });
   }, [combinedLocations, searchQuery, selectedBuilding, selectedFloor, selectedCategory]);
+
+  // Sliced locations for Expand / Collapse
+  const displayedLocations = useMemo(() => {
+    if (isExpanded) return filteredLocations;
+    return filteredLocations.slice(0, INITIAL_LIMIT);
+  }, [filteredLocations, isExpanded]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -237,8 +246,15 @@ export default function Locations() {
             </div>
 
             {/* Results Summary */}
-            <div className="text-xs text-brand-muted font-semibold uppercase tracking-wider flex justify-between">
-              <span>Showing {filteredLocations.length} locations</span>
+            <div className="text-xs text-brand-muted font-semibold uppercase tracking-wider flex justify-between items-center">
+              <span>
+                Showing {displayedLocations.length} of {filteredLocations.length} locations
+                {!isExpanded && filteredLocations.length > INITIAL_LIMIT && (
+                  <span className="text-brand-secondary font-bold normal-case ml-2">
+                    ({filteredLocations.length - INITIAL_LIMIT} more available)
+                  </span>
+                )}
+              </span>
               {filteredLocations.length === 0 && (
                 <span className="text-brand-accent-dest">Try resetting filters to view all entries.</span>
               )}
@@ -246,49 +262,74 @@ export default function Locations() {
 
             {/* Location Cards Grid */}
             {filteredLocations.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredLocations.map((loc) => {
-                  const bName = buildings.find(b => b.code === loc.buildingId)?.name || loc.buildingId;
-                  
-                  return (
-                    <div key={loc.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-brand-secondary">
-                            {loc.category}
-                          </span>
-                          <span className="text-xs text-brand-muted font-medium">Floor {loc.floor === 0 ? 'Ground' : `${loc.floor}st`}</span>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {displayedLocations.map((loc) => {
+                    const bName = buildings.find(b => b.code === loc.buildingId)?.name || loc.buildingId;
+                    
+                    return (
+                      <div key={loc.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-brand-secondary">
+                              {loc.category}
+                            </span>
+                            <span className="text-xs text-brand-muted font-medium">Floor {loc.floor === 0 ? 'Ground' : `${loc.floor}st`}</span>
+                          </div>
+                          
+                          <h3 className="text-lg font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">{loc.name}</h3>
+                          
+                          <p className="text-xs text-brand-muted mt-1.5 flex items-center font-medium">
+                            <Building2 className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                            <span>{bName}</span>
+                          </p>
+
+                          <p className="text-sm text-brand-muted mt-3 line-clamp-2 leading-relaxed">{loc.description}</p>
                         </div>
-                        
-                        <h3 className="text-lg font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">{loc.name}</h3>
-                        
-                        <p className="text-xs text-brand-muted mt-1.5 flex items-center font-medium">
-                          <Building2 className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                          <span>{bName}</span>
-                        </p>
 
-                        <p className="text-sm text-brand-muted mt-3 line-clamp-2 leading-relaxed">{loc.description}</p>
+                        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+                          <Link
+                            to={`/explore?to=${encodeURIComponent(loc.name)}`}
+                            className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
+                          >
+                            <Navigation className="w-3.5 h-3.5 mr-1" />
+                            Navigate Here
+                          </Link>
+                          <Link
+                            to={`/locations/${loc.id}`}
+                            className="flex-1 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5 mr-1" />
+                            View Details
+                          </Link>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-                        <Link
-                          to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                          className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
-                        >
-                          <Navigation className="w-3.5 h-3.5 mr-1" />
-                          Navigate Here
-                        </Link>
-                        <Link
-                          to={`/locations/${loc.id}`}
-                          className="flex-1 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
-                        >
-                          <Eye className="w-3.5 h-3.5 mr-1" />
-                          View Details
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
+                {/* Expand / Collapse Toggle Button */}
+                {filteredLocations.length > INITIAL_LIMIT && (
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-brand-secondary text-brand-primary hover:text-brand-secondary font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUp className="w-4 h-4 text-brand-secondary" />
+                          <span>Show Less (Collapse to {INITIAL_LIMIT} Classrooms)</span>
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4 text-brand-secondary" />
+                          <span>Expand to View All ({filteredLocations.length} Classrooms & Locations)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               // Empty State View

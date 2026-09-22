@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -10,9 +10,22 @@ export default function Login() {
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const redirectMessage = (location.state as any)?.message;
+
+  // If already authenticated, redirect to destination or home/admin
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (user?.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const validate = () => {
     const tempErrors: typeof errors = {};
@@ -47,7 +60,7 @@ export default function Login() {
         if (res.data.role === 'admin') {
           navigate(origin || '/admin');
         } else {
-          navigate(origin || '/profile');
+          navigate(origin || '/');
         }
       }
     } catch (err: any) {
@@ -69,16 +82,32 @@ export default function Login() {
           <p className="text-brand-muted text-xs mt-2">Access your favorite locations and route history.</p>
         </div>
 
+        {/* Redirect Message Notice */}
+        {redirectMessage && (
+          <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs font-semibold text-center animate-fade-in flex items-center justify-center space-x-2">
+            <ShieldAlert className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>{redirectMessage}</span>
+          </div>
+        )}
+
         {/* Credentials Alert */}
-        <div className="p-3 bg-blue-50/80 border border-blue-100 rounded-lg text-[11px] text-brand-primary">
-          <p className="font-bold flex items-center mb-1">
-            <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1" />
-            Verifiable Campus Accounts:
-          </p>
-          <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
-            <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
-            <li>Student Profile: <strong className="text-brand-secondary">student@campus.edu</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
-          </ul>
+        <div className="p-3 bg-blue-50/80 border border-blue-100 rounded-lg text-[11px] text-brand-primary space-y-2">
+          <div>
+            <p className="font-bold flex items-center mb-1">
+              <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1 flex-shrink-0" />
+              Authentication Mandatory:
+            </p>
+            <p className="text-[10px] text-brand-muted leading-relaxed">
+              Verified authentication is required to bookmark campus favorites, record your private route history, and access saved navigation preferences.
+            </p>
+          </div>
+          <div className="border-t border-blue-100 pt-1.5">
+            <p className="font-semibold text-[10px] text-slate-700 mb-1">Verifiable Campus Accounts:</p>
+            <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
+              <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
+              <li>Student Profile: <strong className="text-brand-secondary">student@campus.edu</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
+            </ul>
+          </div>
         </div>
 
         {submitError && (

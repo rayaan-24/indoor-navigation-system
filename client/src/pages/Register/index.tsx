@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface FormErrors {
@@ -218,6 +218,28 @@ export default function Register() {
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-brand-primary">Create an Account</h2>
           <p className="text-brand-muted text-xs mt-2">Sign up to sync favorites and route maps across campus devices.</p>
+        </div>
+
+        {/* Registration Precautions & Requirements Card */}
+        <div className="p-3.5 bg-blue-50/90 border border-blue-100 rounded-xl text-[11px] text-brand-primary space-y-2">
+          <p className="font-bold flex items-center text-brand-secondary">
+            <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-secondary flex-shrink-0" />
+            Registration Guidelines & Security Precautions:
+          </p>
+          <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-brand-secondary text-[11px] leading-relaxed">
+            <li>
+              <strong>Mandatory Authentication:</strong> User authentication is required to bookmark favorite campus locations and maintain your personal route history.
+            </li>
+            <li>
+              <strong>Institutional Email:</strong> Please use a valid campus or academic email address (<span className="text-brand-secondary font-mono text-[10px]">@campus.edu</span>).
+            </li>
+            <li>
+              <strong>Password Criteria:</strong> Minimum 8 characters with at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol.
+            </li>
+            <li>
+              <strong>Account Protection:</strong> Passwords are encrypted with salted hashes. Keep your login credentials private; never share passwords with others.
+            </li>
+          </ul>
         </div>
 
         {submitError && (

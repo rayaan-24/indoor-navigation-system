@@ -4,6 +4,8 @@ import { User, Mail, Heart, History, Navigation, Eye, LogOut, Settings, ArrowRig
 import { useAuth } from '../../context/AuthContext';
 import { getRooms } from '../../services/roomService';
 import { getLandmarks } from '../../services/landmarkService';
+import { getFavorites, deleteFavorite } from '../../services/favoriteService';
+import { getHistory, clearHistory } from '../../services/historyService';
 import type { HistoryItem, Location } from '../../types';
 
 export default function Profile() {
@@ -14,18 +16,22 @@ export default function Profile() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load Favorites and history on mount
+  // Load Favorites and history for the particular logged-in user on mount
   useEffect(() => {
+    if (!user) return;
+
     const loadUserData = async () => {
       try {
         setLoading(true);
-        // Load Favorites list from localStorage
-        const savedFavIds = JSON.parse(localStorage.getItem('favorites') || '[]');
-        
-        // Fetch all rooms and landmarks to resolve names
-        const [rRes, lRes] = await Promise.all([
+        const userFavKey = `favorites_${user.id}`;
+        const userHistKey = `navHistory_${user.id}`;
+
+        // Fetch all rooms, landmarks, user favorites, and user navigation history in parallel
+        const [rRes, lRes, favRes, histRes] = await Promise.all([
           getRooms(),
-          getLandmarks()
+          getLandmarks(),
+          getFavorites(user.id).catch(() => ({ success: false, data: [] })),
+          getHistory(user.id).catch(() => ({ success: false, data: [] }))
         ]);
 
         const roomsData = rRes.success ? rRes.data : [];
@@ -52,39 +58,33 @@ export default function Profile() {
         }));
 
         const allLocs = [...roomsMapped, ...landmarksMapped];
-        let mappedFavs = allLocs.filter((l) => savedFavIds.includes(l.id));
 
-        // Pre-populate demo favorites if empty
-        if (savedFavIds.length === 0) {
-          const demoFavIds = ['b-comp-lab-204', 'a-central-library'];
-          mappedFavs = allLocs.filter((l) => demoFavIds.includes(l.id));
-          localStorage.setItem('favorites', JSON.stringify(demoFavIds));
+        // 1. Resolve user's favorites
+        let savedFavIds: string[] = [];
+        if (favRes.success && Array.isArray(favRes.data)) {
+          savedFavIds = favRes.data.map((f: any) => f.locationId);
+          localStorage.setItem(userFavKey, JSON.stringify(savedFavIds));
+        } else {
+          savedFavIds = JSON.parse(localStorage.getItem(userFavKey) || '[]');
         }
+
+        const mappedFavs = allLocs.filter((l) => savedFavIds.includes(l.id));
         setFavorites(mappedFavs);
 
-        // Load Navigation History
-        const savedHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
-        let finalHistory = savedHistory;
-        
-        // Pre-populate demo history if empty
-        if (savedHistory.length === 0) {
-          const demoHistory: HistoryItem[] = [
-            {
-              id: 'hist-1',
-              fromLocation: { name: 'Main Entrance (Block B)', building: 'Block B', floor: 'Floor 0' },
-              toLocation: { name: 'Computer Laboratory B204', building: 'Block B', floor: 'Floor 2' },
-              timestamp: new Date(Date.now() - 3600000 * 2).toLocaleString(),
-            },
-            {
-              id: 'hist-2',
-              fromLocation: { name: 'Admin Main Entrance', building: 'Block C', floor: 'Floor 0' },
-              toLocation: { name: 'Central Library (Block A)', building: 'Block A', floor: 'Floor 1' },
-              timestamp: new Date(Date.now() - 3600000 * 24).toLocaleString(),
-            },
-          ];
-          finalHistory = demoHistory;
-          localStorage.setItem('navHistory', JSON.stringify(demoHistory));
+        // 2. Resolve user's navigation history
+        let finalHistory: HistoryItem[] = [];
+        if (histRes.success && Array.isArray(histRes.data)) {
+          finalHistory = histRes.data.map((h: any) => ({
+            id: h._id || h.id || Math.random().toString(),
+            fromLocation: { name: h.source },
+            toLocation: { name: h.destination },
+            timestamp: h.createdAt ? new Date(h.createdAt).toLocaleString() : new Date().toLocaleString()
+          }));
+          localStorage.setItem(userHistKey, JSON.stringify(finalHistory));
+        } else {
+          finalHistory = JSON.parse(localStorage.getItem(userHistKey) || '[]');
         }
+
         setHistory(finalHistory);
 
       } catch (err) {
@@ -95,22 +95,36 @@ export default function Profile() {
     };
 
     loadUserData();
-  }, []);
+  }, [user]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  const handleRemoveFavorite = (id: string) => {
-    const updatedIds = JSON.parse(localStorage.getItem('favorites') || '[]').filter((favId: string) => favId !== id);
-    localStorage.setItem('favorites', JSON.stringify(updatedIds));
+  const handleRemoveFavorite = async (id: string) => {
+    if (!user) return;
+    const userFavKey = `favorites_${user.id}`;
+    const updatedIds = JSON.parse(localStorage.getItem(userFavKey) || '[]').filter((favId: string) => favId !== id);
+    localStorage.setItem(userFavKey, JSON.stringify(updatedIds));
     setFavorites((prev) => prev.filter((f) => f.id !== id));
+    try {
+      await deleteFavorite(id, user.id);
+    } catch (err) {
+      console.warn('Failed to delete favorite from server:', err);
+    }
   };
 
-  const handleClearHistory = () => {
-    localStorage.setItem('navHistory', JSON.stringify([]));
+  const handleClearHistory = async () => {
+    if (!user) return;
+    const userHistKey = `navHistory_${user.id}`;
+    localStorage.setItem(userHistKey, JSON.stringify([]));
     setHistory([]);
+    try {
+      await clearHistory(user.id);
+    } catch (err) {
+      console.warn('Failed to clear history on server:', err);
+    }
   };
 
   if (!user) return null;
@@ -257,12 +271,16 @@ export default function Profile() {
                       <div className="flex items-center justify-between text-brand-primary font-bold">
                         <div className="text-left">
                           <p>{item.fromLocation.name}</p>
-                          <span className="text-[9px] text-brand-muted font-normal block capitalize">{item.fromLocation.building.replace('-', ' ')} • {item.fromLocation.floor}</span>
+                          <span className="text-[9px] text-brand-muted font-normal block capitalize">
+                            {item.fromLocation.building ? `${item.fromLocation.building.replace('-', ' ')} • ` : ''}{item.fromLocation.floor || 'Wayfinding Route'}
+                          </span>
                         </div>
                         <ArrowRight className="w-4 h-4 text-slate-400 mx-2 flex-shrink-0" />
                         <div className="text-right">
                           <p>{item.toLocation.name}</p>
-                          <span className="text-[9px] text-brand-muted font-normal block capitalize">{item.toLocation.building.replace('-', ' ')} • {item.toLocation.floor}</span>
+                          <span className="text-[9px] text-brand-muted font-normal block capitalize">
+                            {item.toLocation.building ? `${item.toLocation.building.replace('-', ' ')} • ` : ''}{item.toLocation.floor || 'Campus Destination'}
+                          </span>
                         </div>
                       </div>
 

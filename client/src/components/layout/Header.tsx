@@ -10,7 +10,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   const navLinks = [
@@ -27,7 +27,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center space-x-2 group">
+        <Link to={isAuthenticated ? "/" : "/login"} className="flex items-center space-x-2 group">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-secondary text-white transition-transform group-hover:scale-105">
             <MapPin className="h-6 w-6" />
           </div>
@@ -37,24 +37,26 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex space-x-1 lg:space-x-2">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-slate-100 text-brand-secondary'
-                    : 'text-brand-text hover:bg-slate-55/40 hover:text-brand-secondary hover:bg-slate-55'
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
+        {/* Desktop Navigation - Only visible when authenticated */}
+        {isAuthenticated && (
+          <nav className="hidden md:flex space-x-1 lg:space-x-2">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) =>
+                  `flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-slate-100 text-brand-secondary'
+                      : 'text-brand-text hover:bg-slate-55/40 hover:text-brand-secondary hover:bg-slate-55'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
 
         {/* Right Actions */}
         <div className="hidden md:flex items-center space-x-3">
@@ -89,22 +91,30 @@ export default function Header() {
                 <LogOut className="w-4 h-4 mr-1" />
                 <span>Logout</span>
               </button>
+
+              <Link
+                to="/explore"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-blue-700 active:scale-100"
+              >
+                Start Navigation
+              </Link>
             </>
           ) : (
-            <Link
-              to="/login"
-              className="text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-3 py-2 rounded-md"
-            >
-              Login
-            </Link>
+            <div className="flex items-center space-x-2">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-3 py-2 rounded-md hover:bg-slate-100"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors"
+              >
+                Register
+              </Link>
+            </div>
           )}
-
-          <Link
-            to="/explore"
-            className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-blue-700 active:scale-100"
-          >
-            Start Navigation
-          </Link>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -128,33 +138,33 @@ export default function Header() {
       {/* Mobile Drawer Navigation */}
       {isOpen && (
         <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={() => setIsOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2.5 rounded-md text-base font-medium transition-colors ${
-                  isActive
-                    ? 'bg-slate-100 text-brand-secondary'
-                    : 'text-brand-text hover:bg-slate-55'
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          <hr className="my-2 border-slate-200" />
-          <div className="pt-2 flex flex-col space-y-2">
-            {isAuthenticated && user ? (
-              <>
+          {isAuthenticated ? (
+            <>
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center px-3 py-2.5 rounded-md text-base font-medium transition-colors ${
+                      isActive
+                        ? 'bg-slate-100 text-brand-secondary'
+                        : 'text-brand-text hover:bg-slate-55'
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+              <hr className="my-2 border-slate-200" />
+              <div className="pt-2 flex flex-col space-y-2">
                 <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center space-x-3 px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50 hover:text-brand-secondary"
                 >
                   <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold">
-                    {user.name?.[0]?.toUpperCase() || 'U'}
+                    {user?.name?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <span>My Profile</span>
                 </Link>
@@ -168,25 +178,34 @@ export default function Header() {
                   <LogOut className="w-5 h-5 mr-3" />
                   Logout
                 </button>
-              </>
-            ) : (
+                <Link
+                  to="/explore"
+                  onClick={() => setIsOpen(false)}
+                  className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                >
+                  Start Navigation
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col space-y-2 pt-2">
               <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-55"
+                className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50"
               >
                 <User className="w-5 h-5 mr-3" />
                 Login
               </Link>
-            )}
-            <Link
-              to="/explore"
-              onClick={() => setIsOpen(false)}
-              className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
-            >
-              Start Navigation
-            </Link>
-          </div>
+              <Link
+                to="/register"
+                onClick={() => setIsOpen(false)}
+                className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+              >
+                Register
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>

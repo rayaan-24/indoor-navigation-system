@@ -40,8 +40,8 @@ export default function Help() {
       answer: 'Yes! IndoorNav fully supports multi-floor routing. When a route traverses levels, the directions panel will list floor changes (e.g. "Take Staircase B1 up to Floor 2"). You can click the floor tabs above the map to see the layout of each floor level along the route.'
     },
     {
-      question: 'Can I avoid stairs for wheelchair accessibility?',
-      answer: 'Yes, absolutely. On the Explore/Navigation page, check the "Accessible route (avoid stairs / use elevator)" option. The system will automatically reroute you through elevators instead of stairwells.'
+      question: 'How do turn-by-turn directions work?',
+      answer: 'IndoorNav calculates the shortest walking path through corridors, connectors, and doorways, providing step-by-step guidance straight to your target room or facility.'
     },
     {
       question: 'What if a route or room is blocked or closed?',

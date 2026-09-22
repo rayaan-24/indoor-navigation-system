@@ -32,16 +32,16 @@ import {
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public / User Dashboard Pages */}
+      {/* Protected User & Navigation Pages */}
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<Home />} />
-        <Route path="explore" element={<Explore />} />
-        <Route path="locations" element={<Locations />} />
-        <Route path="locations/:id" element={<LocationDetails />} />
-        <Route path="buildings" element={<Buildings />} />
-        <Route path="buildings/:id" element={<BuildingDetails />} />
-        <Route path="about" element={<About />} />
-        <Route path="help" element={<Help />} />
+        <Route index element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
+        <Route path="locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
+        <Route path="locations/:id" element={<ProtectedRoute><LocationDetails /></ProtectedRoute>} />
+        <Route path="buildings" element={<ProtectedRoute><Buildings /></ProtectedRoute>} />
+        <Route path="buildings/:id" element={<ProtectedRoute><BuildingDetails /></ProtectedRoute>} />
+        <Route path="about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+        <Route path="help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

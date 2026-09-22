@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MapPin, Navigation, Accessibility, CheckCircle2, Compass } from 'lucide-react';
+import { MapPin, Navigation, CheckCircle2, Compass } from 'lucide-react';
 import { getBuildings, getBuildingLayout } from '../../services/buildingService';
 import { calculateRoute } from '../../services/navigationService';
 import { createHistory } from '../../services/historyService';
@@ -37,7 +37,6 @@ export default function Explore() {
   // Map Navigation States
   const [selectedBuildingId, setSelectedBuildingId] = useState('sjt-ground');
   const [currentFloor, setCurrentFloor] = useState(0);
-  const [avoidStairs, setAvoidStairs] = useState(false);
 
   // Interactive Simulated Navigation Mode States
   const [navigating, setNavigating] = useState(false);
@@ -169,12 +168,17 @@ export default function Explore() {
     });
   };
 
-  // Load recent destinations from localStorage history
+  // Load recent destinations from history for the particular authenticated user
   useEffect(() => {
-    const savedHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
+    if (!user) {
+      setRecentDestinations([]);
+      return;
+    }
+    const userHistKey = `navHistory_${user.id}`;
+    const savedHistory = JSON.parse(localStorage.getItem(userHistKey) || '[]');
     const uniqueDests: string[] = Array.from(new Set(savedHistory.map((h: any) => h.toLocation?.name || h.destination).filter(Boolean)));
     setRecentDestinations(uniqueDests.slice(0, 4));
-  }, [activeRoute]);
+  }, [activeRoute, user]);
 
   // Parse query params (e.g., from home page redirects)
   useEffect(() => {
@@ -247,7 +251,7 @@ export default function Explore() {
       const response = await calculateRoute({
         sourceId: fromLocation.id,
         destinationId: toLocation.id,
-        preferences: { avoidStairs }
+        preferences: {}
       });
 
       if (response.success && response.data) {
@@ -266,7 +270,7 @@ export default function Explore() {
         setActiveRoute(mappedRoute);
         setCurrentFloor(fromLocation.floor);
 
-        // Log to database history if authenticated
+        // Log to database and local cache for the particular authenticated user
         if (user) {
           try {
             await createHistory({
@@ -283,8 +287,9 @@ export default function Explore() {
               toLocation: { name: `${toLocation.id} - ${toLocation.name}`, building: selectedBuildingId, floor: `Floor 0` },
               timestamp: new Date().toLocaleString(),
             };
-            const existingHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
-            localStorage.setItem('navHistory', JSON.stringify([historyItem, ...existingHistory].slice(0, 10)));
+            const userHistKey = `navHistory_${user.id}`;
+            const existingHistory = JSON.parse(localStorage.getItem(userHistKey) || '[]');
+            localStorage.setItem(userHistKey, JSON.stringify([historyItem, ...existingHistory].slice(0, 10)));
           } catch (histErr) {
             console.warn('Failed to log route to history:', histErr);
           }
@@ -487,20 +492,6 @@ export default function Explore() {
                 )}
               </div>
 
-              {/* Accessibility Settings */}
-              <div className="flex items-center space-x-2 pt-2 border-t border-slate-100">
-                <input
-                  type="checkbox"
-                  id="accessibleCheck"
-                  checked={avoidStairs}
-                  onChange={(e) => setAvoidStairs(e.target.checked)}
-                  className="rounded border-slate-200 text-brand-secondary focus:ring-brand-secondary h-4 w-4 cursor-pointer"
-                />
-                <label htmlFor="accessibleCheck" className="text-xs font-semibold text-brand-primary flex items-center cursor-pointer select-none">
-                  <Accessibility className="w-4 h-4 text-brand-secondary mr-1.5" />
-                  Wheelchair Accessible Route
-                </label>
-              </div>
 
               {/* Recent Destinations shortcut links */}
               {recentDestinations.length > 0 && (

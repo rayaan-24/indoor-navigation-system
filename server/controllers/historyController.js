@@ -49,7 +49,24 @@ const createHistory = async (req, res, next) => {
   }
 };
 
+// @desc    Clear user navigation history
+// @route   DELETE /api/history
+// @access  Private
+const clearHistory = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    await History.deleteMany({ userId });
+    res.status(200).json({
+      success: true,
+      message: 'Navigation history cleared successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getHistory,
-  createHistory
+  createHistory,
+  clearHistory
 };

@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Navigation, MapPin, Building2, Clock, ArrowLeft, Heart, CheckCircle, AlertCircle } from 'lucide-react';
 import { getRoomById } from '../../services/roomService';
 import { getLandmarks } from '../../services/landmarkService';
+import { getFavorites, createFavorite, deleteFavorite } from '../../services/favoriteService';
+import { useAuth } from '../../context/AuthContext';
 import IndoorMap from '../../components/map/IndoorMap';
 import type { Location } from '../../types';
 
 export default function LocationDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const routerLocation = useLocation();
+  const { user, isAuthenticated } = useAuth();
+
   const [location, setLocation] = useState<Location | null>(null);
   const [nearbyLocs, setNearbyLocs] = useState<Location[]>([]);
   
   const [isFavorite, setIsFavorite] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'auth_required'>('success');
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -50,9 +56,25 @@ export default function LocationDetails() {
         };
         setLocation(mappedLoc);
 
-        // Check favorites
-        const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-        setIsFavorite(favorites.includes(mappedLoc.id));
+        // Check favorites for the particular authenticated user
+        if (isAuthenticated && user?.id) {
+          try {
+            const favRes = await getFavorites(user.id);
+            if (favRes.success && Array.isArray(favRes.data)) {
+              const userFavIds = favRes.data.map((f: any) => f.locationId);
+              localStorage.setItem(`favorites_${user.id}`, JSON.stringify(userFavIds));
+              setIsFavorite(userFavIds.includes(mappedLoc.id));
+            } else {
+              const userFavs = JSON.parse(localStorage.getItem(`favorites_${user.id}`) || '[]');
+              setIsFavorite(userFavs.includes(mappedLoc.id));
+            }
+          } catch {
+            const userFavs = JSON.parse(localStorage.getItem(`favorites_${user.id}`) || '[]');
+            setIsFavorite(userFavs.includes(mappedLoc.id));
+          }
+        } else {
+          setIsFavorite(false);
+        }
 
         // 2. Fetch landmarks on the same floor for "Nearby Locations"
         const lRes = await getLandmarks();
@@ -83,21 +105,47 @@ export default function LocationDetails() {
     };
 
     fetchLocationData();
-  }, [id]);
+  }, [id, isAuthenticated, user]);
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     if (!location) return;
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    let updatedFavorites;
-    if (isFavorite) {
-      updatedFavorites = favorites.filter((favId: string) => favId !== location.id);
-      setToastMessage('Removed from favorites.');
-    } else {
-      updatedFavorites = [...favorites, location.id];
-      setToastMessage('Added to favorites.');
+
+    // Authentication is strictly mandatory to add or modify favorites
+    if (!isAuthenticated || !user) {
+      setToastType('auth_required');
+      setToastMessage('Authentication is mandatory to add favorites. Please log in first.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4500);
+      return;
     }
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-    setIsFavorite(!isFavorite);
+
+    const userFavKey = `favorites_${user.id}`;
+    const favorites: string[] = JSON.parse(localStorage.getItem(userFavKey) || '[]');
+
+    if (isFavorite) {
+      const updated = favorites.filter((favId: string) => favId !== location.id);
+      localStorage.setItem(userFavKey, JSON.stringify(updated));
+      setIsFavorite(false);
+      setToastType('success');
+      setToastMessage('Removed from favorites.');
+      try {
+        await deleteFavorite(location.id, user.id);
+      } catch (err) {
+        console.warn('Failed to delete favorite from server:', err);
+      }
+    } else {
+      const updated = [...favorites, location.id];
+      localStorage.setItem(userFavKey, JSON.stringify(updated));
+      setIsFavorite(true);
+      setToastType('success');
+      setToastMessage('Added to your account favorites.');
+      try {
+        await createFavorite(user.id, location.id, 'Room');
+      } catch (err) {
+        console.warn('Failed to create favorite on server:', err);
+      }
+    }
+
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
@@ -211,7 +259,7 @@ export default function LocationDetails() {
                     ? 'border-red-200 bg-red-50 text-brand-accent-dest hover:bg-red-100'
                     : 'border-slate-200 hover:bg-slate-50 text-brand-muted hover:text-brand-secondary'
                 }`}
-                title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                title={!isAuthenticated ? 'Sign in required to save favorites' : (isFavorite ? 'Remove from Favorites' : 'Add to Favorites')}
               >
                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-brand-accent-dest' : ''}`} />
               </button>
@@ -263,6 +311,38 @@ export default function LocationDetails() {
         </div>
 
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div
+          className={`fixed bottom-6 right-6 ${
+            toastType === 'auth_required'
+              ? 'bg-slate-900 border border-amber-500/80 shadow-2xl'
+              : 'bg-brand-primary border border-slate-700 shadow-xl'
+          } text-white text-xs px-4 py-3 rounded-xl flex items-center space-x-3 z-50 animate-fade-in`}
+        >
+          {toastType === 'auth_required' ? (
+            <>
+              <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+              <div>
+                <p className="font-bold text-amber-300 text-xs">Authentication Mandatory</p>
+                <p className="text-[11px] text-slate-300">{toastMessage}</p>
+              </div>
+              <button
+                onClick={() => navigate('/login', { state: { from: routerLocation } })}
+                className="ml-2 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-[11px] rounded transition-colors whitespace-nowrap cursor-pointer shadow"
+              >
+                Sign In
+              </button>
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-4 h-4 text-brand-accent-loc flex-shrink-0" />
+              <span>{toastMessage}</span>
+            </>
+          )}
+        </div>
+      )}
 
     </div>
   );

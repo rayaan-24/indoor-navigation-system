@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children, adminOnly = false }: Protecte
 
   if (!isAuthenticated) {
     // Redirect to login page, save target path for redirecting back after login
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location, message: 'Please log in to access this screen.' }} replace />;
   }
 
   if (adminOnly && user?.role !== 'admin') {

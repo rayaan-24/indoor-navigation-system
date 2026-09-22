@@ -3,9 +3,12 @@ const router = express.Router();
 const {
   getHistory,
   createHistory,
-  clearHistory
+  clearHistory,
+  getAnalytics
 } = require('../controllers/historyController');
 const { authenticate } = require('../middleware/auth');
+
+router.get('/analytics', authenticate, getAnalytics);
 
 router.route('/')
   .get(authenticate, getHistory)

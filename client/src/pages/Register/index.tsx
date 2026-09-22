@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { authContent } from '../../content/authContent';
 
 interface FormErrors {
   fullName?: string;
@@ -210,35 +211,30 @@ export default function Register() {
     return isInvalid ? 'text-brand-accent-dest' : 'text-slate-400';
   };
 
+  const { register: content } = authContent;
+
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-slate-50">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-md space-y-6">
         
         {/* Header Title */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-brand-primary">Create an Account</h2>
-          <p className="text-brand-muted text-xs mt-2">Sign up to sync favorites and route maps across campus devices.</p>
+          <h2 className="text-3xl font-extrabold text-brand-primary">{content.title}</h2>
+          <p className="text-brand-muted text-xs mt-2">{content.subtitle}</p>
         </div>
 
         {/* Registration Precautions & Requirements Card */}
         <div className="p-3.5 bg-blue-50/90 border border-blue-100 rounded-xl text-[11px] text-brand-primary space-y-2">
           <p className="font-bold flex items-center text-brand-secondary">
             <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-secondary flex-shrink-0" />
-            Registration Guidelines & Security Precautions:
+            {content.precautions.title}
           </p>
           <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-brand-secondary text-[11px] leading-relaxed">
-            <li>
-              <strong>Mandatory Authentication:</strong> User authentication is required to bookmark favorite campus locations and maintain your personal route history.
-            </li>
-            <li>
-              <strong>Institutional Email:</strong> Please use a valid campus or academic email address (<span className="text-brand-secondary font-mono text-[10px]">@campus.edu</span>).
-            </li>
-            <li>
-              <strong>Password Criteria:</strong> Minimum 8 characters with at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol.
-            </li>
-            <li>
-              <strong>Account Protection:</strong> Passwords are encrypted with salted hashes. Keep your login credentials private; never share passwords with others.
-            </li>
+            {content.precautions.items.map((item, idx) => (
+              <li key={idx}>
+                <strong>{item.label}:</strong> {item.text}
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -253,7 +249,7 @@ export default function Register() {
           {/* Full Name */}
           <div className="space-y-1">
             <label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-              Full Name
+              {content.fields.fullNameLabel}
             </label>
             <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('fullName')}`}>
               <User className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('fullName')}`} />
@@ -261,7 +257,7 @@ export default function Register() {
                 id="fullName"
                 name="fullName"
                 type="text"
-                placeholder="Jane Doe"
+                placeholder={content.fields.fullNamePlaceholder}
                 value={fullName}
                 onChange={handleFullNameChange}
                 onBlur={() => handleBlur('fullName')}
@@ -280,7 +276,7 @@ export default function Register() {
           {/* Email field */}
           <div className="space-y-1">
             <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-              Email Address
+              {content.fields.emailLabel}
             </label>
             <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('email')}`}>
               <Mail className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('email')}`} />
@@ -288,7 +284,7 @@ export default function Register() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@campus.edu"
+                placeholder={content.fields.emailPlaceholder}
                 value={email}
                 onChange={handleEmailChange}
                 onBlur={() => handleBlur('email')}
@@ -307,7 +303,7 @@ export default function Register() {
           {/* Password field */}
           <div className="space-y-1">
             <label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-              Password
+              {content.fields.passwordLabel}
             </label>
             <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('password')}`}>
               <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('password')}`} />
@@ -315,7 +311,7 @@ export default function Register() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Minimum 8 characters"
+                placeholder={content.fields.passwordPlaceholder}
                 value={password}
                 onChange={handlePasswordChange}
                 onBlur={() => handleBlur('password')}
@@ -334,7 +330,7 @@ export default function Register() {
           {/* Confirm Password field */}
           <div className="space-y-1">
             <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-              Confirm Password
+              {content.fields.confirmPasswordLabel}
             </label>
             <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('confirmPassword')}`}>
               <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('confirmPassword')}`} />
@@ -342,7 +338,7 @@ export default function Register() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                placeholder="Re-enter password"
+                placeholder={content.fields.confirmPasswordPlaceholder}
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
                 onBlur={() => handleBlur('confirmPassword')}
@@ -364,14 +360,14 @@ export default function Register() {
             disabled={isSubmitting}
             className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? 'Registering...' : 'Register Account'}
+            {isSubmitting ? content.submittingText : content.submitButton}
           </button>
         </form>
 
         {/* Redirect toggle */}
         <div className="text-center pt-2 text-xs">
-          <span className="text-brand-muted">Already registered? </span>
-          <Link to="/login" className="font-bold text-brand-secondary hover:underline">Sign In</Link>
+          <span className="text-brand-muted">{content.switchPrompt} </span>
+          <Link to="/login" className="font-bold text-brand-secondary hover:underline">{content.switchLinkText}</Link>
         </div>
 
       </div>

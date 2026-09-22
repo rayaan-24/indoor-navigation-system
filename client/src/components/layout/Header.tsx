@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { MapPin, Menu, X, User, LogOut, Compass, Building2, Search, Settings } from 'lucide-react';
+import { MapPin, Menu, X, User, LogOut, Compass, Building2, Search, Settings, Info, HelpCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { siteConfig } from '../../config/siteConfig';
+import { headerNavLinks, actionLabels } from '../../config/navigation';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,14 +15,17 @@ export default function Header() {
     navigate('/login');
   };
 
-  const navLinks = [
-    { path: '/', label: 'Home', icon: <Compass className="w-4 h-4 mr-1.5" /> },
-    { path: '/explore', label: 'Explore', icon: <MapPin className="w-4 h-4 mr-1.5" /> },
-    { path: '/buildings', label: 'Buildings', icon: <Building2 className="w-4 h-4 mr-1.5" /> },
-    { path: '/locations', label: 'Locations', icon: <Search className="w-4 h-4 mr-1.5" /> },
-    { path: '/about', label: 'About', icon: null },
-    { path: '/help', label: 'Help', icon: null },
-  ];
+  const getNavIcon = (iconName?: string) => {
+    switch (iconName) {
+      case 'Compass': return <Compass className="w-4 h-4 mr-1.5" />;
+      case 'MapPin': return <MapPin className="w-4 h-4 mr-1.5" />;
+      case 'Building2': return <Building2 className="w-4 h-4 mr-1.5" />;
+      case 'Search': return <Search className="w-4 h-4 mr-1.5" />;
+      case 'Info': return <Info className="w-4 h-4 mr-1.5" />;
+      case 'HelpCircle': return <HelpCircle className="w-4 h-4 mr-1.5" />;
+      default: return null;
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm">
@@ -32,15 +37,15 @@ export default function Header() {
             <MapPin className="h-6 w-6" />
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold tracking-tight text-brand-primary">IndoorNav</span>
-            <span className="text-[10px] text-brand-muted -mt-1">Find Your Way Inside.</span>
+            <span className="text-xl font-bold tracking-tight text-brand-primary">{siteConfig.name}</span>
+            <span className="text-[10px] text-brand-muted -mt-1">{siteConfig.tagline}</span>
           </div>
         </Link>
 
         {/* Desktop Navigation - Only visible when authenticated */}
         {isAuthenticated && (
           <nav className="hidden md:flex space-x-1 lg:space-x-2">
-            {navLinks.map((link) => (
+            {headerNavLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
@@ -52,6 +57,7 @@ export default function Header() {
                   }`
                 }
               >
+                {getNavIcon(link.iconName)}
                 {link.label}
               </NavLink>
             ))}
@@ -96,7 +102,7 @@ export default function Header() {
                 to="/explore"
                 className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-blue-700 active:scale-100"
               >
-                Start Navigation
+                {actionLabels.startNavigation}
               </Link>
             </>
           ) : (
@@ -105,13 +111,13 @@ export default function Header() {
                 to="/login"
                 className="text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-3 py-2 rounded-md hover:bg-slate-100"
               >
-                Login
+                {actionLabels.login}
               </Link>
               <Link
                 to="/register"
                 className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors"
               >
-                Register
+                {actionLabels.register}
               </Link>
             </div>
           )}
@@ -120,7 +126,7 @@ export default function Header() {
         {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center space-x-2">
           {isAuthenticated && user?.role === 'admin' && (
-            <Link to="/admin" className="p-1.5 text-brand-muted hover:text-brand-secondary">
+            <Link to="/admin" className="p-1.5 text-brand-muted hover:text-brand-secondary" title={actionLabels.adminDashboard}>
               <Settings className="w-5 h-5" />
             </Link>
           )}
@@ -140,7 +146,7 @@ export default function Header() {
         <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1">
           {isAuthenticated ? (
             <>
-              {navLinks.map((link) => (
+              {headerNavLinks.map((link) => (
                 <NavLink
                   key={link.path}
                   to={link.path}
@@ -166,7 +172,7 @@ export default function Header() {
                   <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold">
                     {user?.name?.[0]?.toUpperCase() || 'U'}
                   </div>
-                  <span>My Profile</span>
+                  <span>{actionLabels.myProfile}</span>
                 </Link>
                 <button
                   onClick={() => {
@@ -176,14 +182,14 @@ export default function Header() {
                   className="flex items-center w-full px-3 py-2.5 rounded-md text-base font-medium text-brand-muted hover:bg-slate-50 hover:text-brand-accent-dest text-left cursor-pointer"
                 >
                   <LogOut className="w-5 h-5 mr-3" />
-                  Logout
+                  {actionLabels.logout}
                 </button>
                 <Link
                   to="/explore"
                   onClick={() => setIsOpen(false)}
                   className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
                 >
-                  Start Navigation
+                  {actionLabels.startNavigation}
                 </Link>
               </div>
             </>
@@ -195,14 +201,14 @@ export default function Header() {
                 className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50"
               >
                 <User className="w-5 h-5 mr-3" />
-                Login
+                {actionLabels.login}
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsOpen(false)}
                 className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
               >
-                Register
+                {actionLabels.register}
               </Link>
             </div>
           )}

@@ -4,6 +4,7 @@ import { Search, Building2, Filter, Eye, Navigation, RotateCcw, AlertCircle, Che
 import { getBuildings } from '../../services/buildingService';
 import { getRooms } from '../../services/roomService';
 import { getLandmarks } from '../../services/landmarkService';
+import { locationsContent } from '../../content/locationsContent';
 import type { LocationCategory, Location } from '../../types';
 
 export default function Locations() {
@@ -17,7 +18,7 @@ export default function Locations() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   
   const [isExpanded, setIsExpanded] = useState(false);
-  const INITIAL_LIMIT = 6;
+  const INITIAL_LIMIT = locationsContent.expandControls.initialLimit;
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -127,8 +128,8 @@ export default function Locations() {
       
       {/* Page Header */}
       <div className="pb-6 mb-8 border-b border-slate-200">
-        <h1 className="text-3xl font-extrabold text-brand-primary">Campus Locations Directory</h1>
-        <p className="text-brand-muted text-sm mt-1">Search and filter rooms, facilities, departments, and utility rooms across campus buildings.</p>
+        <h1 className="text-3xl font-extrabold text-brand-primary">{locationsContent.header.title}</h1>
+        <p className="text-brand-muted text-sm mt-1">{locationsContent.header.subtitle}</p>
       </div>
 
       {loading ? (
@@ -229,7 +230,7 @@ export default function Locations() {
                 <Search className="w-5 h-5 text-brand-muted ml-4" />
                 <input
                   type="text"
-                  placeholder="Search rooms, labs, offices, corridors, departments..."
+                  placeholder={locationsContent.search.placeholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-3 py-4 text-sm text-brand-primary bg-transparent focus:outline-none"
@@ -248,11 +249,10 @@ export default function Locations() {
             {/* Results Summary */}
             <div className="text-xs text-brand-muted font-semibold uppercase tracking-wider flex justify-between items-center">
               <span>
-                Showing {displayedLocations.length} of {filteredLocations.length} locations
-                {!isExpanded && filteredLocations.length > INITIAL_LIMIT && (
-                  <span className="text-brand-secondary font-bold normal-case ml-2">
-                    ({filteredLocations.length - INITIAL_LIMIT} more available)
-                  </span>
+                {locationsContent.expandControls.summaryText(
+                  displayedLocations.length,
+                  filteredLocations.length,
+                  filteredLocations.length - displayedLocations.length
                 )}
               </span>
               {filteredLocations.length === 0 && (
@@ -293,14 +293,14 @@ export default function Locations() {
                             className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
                           >
                             <Navigation className="w-3.5 h-3.5 mr-1" />
-                            Navigate Here
+                            {locationsContent.buttons.navigateHere}
                           </Link>
                           <Link
                             to={`/locations/${loc.id}`}
                             className="flex-1 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
                           >
                             <Eye className="w-3.5 h-3.5 mr-1" />
-                            View Details
+                            {locationsContent.buttons.viewDetails}
                           </Link>
                         </div>
                       </div>
@@ -319,12 +319,12 @@ export default function Locations() {
                       {isExpanded ? (
                         <>
                           <ChevronUp className="w-4 h-4 text-brand-secondary" />
-                          <span>Show Less (Collapse to {INITIAL_LIMIT} Classrooms)</span>
+                          <span>{locationsContent.expandControls.collapseButtonText(INITIAL_LIMIT)}</span>
                         </>
                       ) : (
                         <>
                           <ChevronDown className="w-4 h-4 text-brand-secondary" />
-                          <span>Expand to View All ({filteredLocations.length} Classrooms & Locations)</span>
+                          <span>{locationsContent.expandControls.expandButtonText(filteredLocations.length)}</span>
                         </>
                       )}
                     </button>
@@ -337,15 +337,15 @@ export default function Locations() {
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-150">
                   <Search className="w-7 h-7 text-brand-muted" />
                 </div>
-                <h3 className="text-lg font-bold text-brand-primary">No locations found</h3>
+                <h3 className="text-lg font-bold text-brand-primary">{locationsContent.emptyState.title}</h3>
                 <p className="text-brand-muted text-sm max-w-sm mx-auto mt-2 leading-relaxed">
-                  We couldn't find any rooms matching your search queries. Try adjusting your building, floor, or category filters.
+                  {locationsContent.emptyState.description}
                 </p>
                 <button
                   onClick={handleResetFilters}
                   className="mt-5 inline-flex items-center justify-center rounded-lg bg-brand-primary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-slate-800 transition-colors cursor-pointer"
                 >
-                  Clear all filters
+                  {locationsContent.emptyState.resetButtonText}
                 </button>
               </div>
             )}

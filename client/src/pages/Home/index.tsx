@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, Compass, Layers, Accessibility, ArrowRight, Building2, MapPin, Award } from 'lucide-react';
 import { getBuildings } from '../../services/buildingService';
 import { getRooms, searchLocations } from '../../services/roomService';
+import { homeContent } from '../../content/homeContent';
 import type { Location } from '../../types';
 
 export default function Home() {
@@ -94,14 +95,14 @@ export default function Home() {
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center space-x-2 bg-blue-50 text-brand-secondary px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase">
               <Award className="w-4 h-4" />
-              <span>Smart Indoor Wayfinding</span>
+              <span>{homeContent.hero.badge}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-primary leading-tight">
-              Find Your Way <br />
-              <span className="text-brand-secondary">Inside.</span>
+              {homeContent.hero.titleLine1} <br />
+              <span className="text-brand-secondary">{homeContent.hero.titleLine2}</span>
             </h1>
             <p className="text-lg text-brand-muted max-w-lg leading-relaxed">
-              Navigate classrooms, laboratories, offices, departments, and campus facilities with simple, clear indoor directions.
+              {homeContent.hero.subtitle}
             </p>
 
             {/* CTAs */}
@@ -110,14 +111,14 @@ export default function Home() {
                 to="/explore"
                 className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-6 py-3.5 text-base font-semibold text-white shadow-md hover:bg-blue-700 transition-colors"
               >
-                Start Navigation
+                {homeContent.hero.ctaPrimary}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <Link
                 to="/buildings"
                 className="inline-flex items-center justify-center rounded-lg border border-slate-250 bg-white px-6 py-3.5 text-base font-semibold text-brand-primary hover:bg-slate-50 transition-colors border-slate-200"
               >
-                Explore Buildings
+                {homeContent.hero.ctaSecondary}
               </Link>
             </div>
 
@@ -127,7 +128,7 @@ export default function Home() {
                 <Search className="w-5 h-5 text-brand-muted ml-4 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder="Where do you want to go?"
+                  placeholder={homeContent.hero.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-3 py-4 text-sm text-brand-primary bg-transparent focus:outline-none"
@@ -217,42 +218,27 @@ export default function Home() {
       <section className="py-16 bg-white border-b border-slate-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="text-3xl font-extrabold text-brand-primary">Designed for Seamless Mobility</h2>
+            <h2 className="text-3xl font-extrabold text-brand-primary">{homeContent.features.title}</h2>
             <p className="text-brand-muted text-sm leading-relaxed">
-              No more getting lost in corridors. Discover our multi-floor pathway routing, custom directory listings, and accessibility options.
+              {homeContent.features.subtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-4 hover:shadow-md transition-shadow">
-              <div className="h-12 w-12 bg-blue-50 text-brand-secondary rounded-xl flex items-center justify-center">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-brand-primary">Interactive Map Grid</h3>
-              <p className="text-brand-muted text-sm leading-relaxed">
-                Zoom and pan SVG layouts of campus blocks. Click room spaces to view department, hours, and navigation waypoints.
-              </p>
-            </div>
-            
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-4 hover:shadow-md transition-shadow">
-              <div className="h-12 w-12 bg-blue-50 text-brand-secondary rounded-xl flex items-center justify-center">
-                <Layers className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-brand-primary">Multi-Floor Wayfinding</h3>
-              <p className="text-brand-muted text-sm leading-relaxed">
-                Get seamless direction steps when your source and target locations span different floor levels, using staircases or elevators.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-4 hover:shadow-md transition-shadow">
-              <div className="h-12 w-12 bg-blue-50 text-brand-secondary rounded-xl flex items-center justify-center">
-                <Accessibility className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-brand-primary">Accessibility Options</h3>
-              <p className="text-brand-muted text-sm leading-relaxed">
-                Filter pathways to only include elevators, ramps, and accessible toilets, ensuring easy navigation for everyone.
-              </p>
-            </div>
+            {homeContent.features.items.map((feat, idx) => {
+              const IconComp = idx === 0 ? Compass : idx === 1 ? Layers : Accessibility;
+              return (
+                <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-4 hover:shadow-md transition-shadow">
+                  <div className="h-12 w-12 bg-blue-50 text-brand-secondary rounded-xl flex items-center justify-center">
+                    <IconComp className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-brand-primary">{feat.title}</h3>
+                  <p className="text-brand-muted text-sm leading-relaxed">
+                    {feat.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -263,11 +249,11 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold text-brand-primary">Popular Destinations</h2>
-                <p className="text-brand-muted text-sm">Frequently visited rooms and amenities across the campus.</p>
+                <h2 className="text-3xl font-bold text-brand-primary">{homeContent.popularDestinations.title}</h2>
+                <p className="text-brand-muted text-sm">{homeContent.popularDestinations.subtitle}</p>
               </div>
               <Link to="/locations" className="text-sm font-semibold text-brand-secondary hover:text-blue-700 flex items-center">
-                View All Locations
+                {homeContent.popularDestinations.viewAllButton}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
             </div>
@@ -316,11 +302,11 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold text-brand-primary">Explore Campus Buildings</h2>
-                <p className="text-brand-muted text-sm">Browse our complex layout floor plans by block.</p>
+                <h2 className="text-3xl font-bold text-brand-primary">{homeContent.campusBuildings.title}</h2>
+                <p className="text-brand-muted text-sm">{homeContent.campusBuildings.subtitle}</p>
               </div>
               <Link to="/buildings" className="text-sm font-semibold text-brand-secondary hover:text-blue-700 flex items-center">
-                View All Buildings
+                {homeContent.campusBuildings.viewBuildingsButton}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
             </div>

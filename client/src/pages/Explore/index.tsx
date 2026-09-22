@@ -6,6 +6,7 @@ import { calculateRoute } from '../../services/navigationService';
 import { createHistory } from '../../services/historyService';
 import { useAuth } from '../../context/AuthContext';
 import IndoorMap from '../../components/map/IndoorMap';
+import { exploreContent } from '../../content/exploreContent';
 import type { Location } from '../../types';
 
 export default function Explore() {
@@ -352,8 +353,8 @@ export default function Explore() {
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-200">
         <div>
-          <h1 className="text-3xl font-extrabold text-brand-primary">Explore & Navigate</h1>
-          <p className="text-brand-muted text-sm mt-1">Indoor Wayfinding for SJT Ground Floor (Metric Layout • 120m × 94m)</p>
+          <h1 className="text-3xl font-extrabold text-brand-primary">{exploreContent.header.title}</h1>
+          <p className="text-brand-muted text-sm mt-1">{exploreContent.header.subtitle}</p>
         </div>
 
         {/* Building Selector Dropdown */}
@@ -391,7 +392,7 @@ export default function Explore() {
             
             <h2 className="text-lg font-bold text-brand-primary mb-4 flex items-center">
               <Compass className="w-5 h-5 text-brand-secondary mr-2" />
-              <span>Wayfinding Planner</span>
+              <span>{exploreContent.planner.title}</span>
             </h2>
 
             <form onSubmit={handleFindRoute} className="space-y-4">

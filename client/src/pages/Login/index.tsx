@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { authContent } from '../../content/authContent';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -72,14 +73,16 @@ export default function Login() {
     }
   };
 
+  const { login: content } = authContent;
+
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-slate-50">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-md space-y-6">
         
         {/* Header Title */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-brand-primary">Sign in to IndoorNav</h2>
-          <p className="text-brand-muted text-xs mt-2">Access your favorite locations and route history.</p>
+          <h2 className="text-3xl font-extrabold text-brand-primary">{content.title}</h2>
+          <p className="text-brand-muted text-xs mt-2">{content.subtitle}</p>
         </div>
 
         {/* Redirect Message Notice */}
@@ -95,17 +98,17 @@ export default function Login() {
           <div>
             <p className="font-bold flex items-center mb-1">
               <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1 flex-shrink-0" />
-              Authentication Mandatory:
+              {content.mandatoryAuth.title}
             </p>
             <p className="text-[10px] text-brand-muted leading-relaxed">
-              Verified authentication is required to bookmark campus favorites, record your private route history, and access saved navigation preferences.
+              {content.mandatoryAuth.description}
             </p>
           </div>
           <div className="border-t border-blue-100 pt-1.5">
-            <p className="font-semibold text-[10px] text-slate-700 mb-1">Verifiable Campus Accounts:</p>
+            <p className="font-semibold text-[10px] text-slate-700 mb-1">{content.demoAccounts.title}</p>
             <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
-              <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
-              <li>Student Profile: <strong className="text-brand-secondary">student@campus.edu</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
+              <li>{content.demoAccounts.admin.label}: <strong className="text-brand-secondary">{content.demoAccounts.admin.email}</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">{content.demoAccounts.admin.password}</span>)</li>
+              <li>{content.demoAccounts.student.label}: <strong className="text-brand-secondary">{content.demoAccounts.student.email}</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">{content.demoAccounts.student.password}</span>)</li>
             </ul>
           </div>
         </div>
@@ -119,12 +122,12 @@ export default function Login() {
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           {/* Email field */}
           <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Email Address</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">{content.fields.emailLabel}</label>
             <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
               <Mail className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="email"
-                placeholder="you@campus.com"
+                placeholder={content.fields.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
@@ -136,14 +139,14 @@ export default function Login() {
           {/* Password field */}
           <div className="space-y-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Password</label>
-              <a href="#forgot" className="text-[10px] text-brand-secondary hover:underline font-semibold">Forgot?</a>
+              <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">{content.fields.passwordLabel}</label>
+              <a href="#forgot" className="text-[10px] text-brand-secondary hover:underline font-semibold">{content.fields.forgotPasswordText}</a>
             </div>
             <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
               <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="password"
-                placeholder="••••••••"
+                placeholder={content.fields.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
@@ -158,14 +161,14 @@ export default function Login() {
             disabled={isSubmitting}
             className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? content.submittingText : content.submitButton}
           </button>
         </form>
 
         {/* Redirect toggle */}
         <div className="text-center pt-2 text-xs">
-          <span className="text-brand-muted">New to campus? </span>
-          <Link to="/register" className="font-bold text-brand-secondary hover:underline">Create an Account</Link>
+          <span className="text-brand-muted">{content.switchPrompt} </span>
+          <Link to="/register" className="font-bold text-brand-secondary hover:underline">{content.switchLinkText}</Link>
         </div>
 
       </div>

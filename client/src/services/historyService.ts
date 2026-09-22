@@ -14,3 +14,8 @@ export const clearHistory = async (userId?: string) => {
   const response = await api.delete('/history', { params: { userId } });
   return response.data;
 };
+
+export const getUsageAnalytics = async () => {
+  const response = await api.get('/history/analytics');
+  return response.data;
+};

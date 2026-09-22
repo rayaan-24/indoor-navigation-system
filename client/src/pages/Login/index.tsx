@@ -76,8 +76,8 @@ export default function Login() {
             Verifiable Campus Accounts:
           </p>
           <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
-            <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: 123456)</li>
-            <li>Student Profile: <strong className="text-brand-secondary">student@campus.edu</strong> (pass: 123456)</li>
+            <li>Admin Console: <strong className="text-brand-secondary">admin@indoornav.com</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
+            <li>Student Profile: <strong className="text-brand-secondary">student@campus.edu</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">IndoorNav@123</span>)</li>
           </ul>
         </div>
 

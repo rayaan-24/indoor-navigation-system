@@ -144,8 +144,8 @@ The database seeder configures the following login credentials:
 
 | Role | Email Login | Password |
 | :--- | :--- | :--- |
-| **Student** | `student@campus.edu` | `123456` |
-| **Admin** | `admin@indoornav.com` | `123456` |
+| **Student** | `student@campus.edu` | `IndoorNav@123` |
+| **Admin** | `admin@indoornav.com` | `IndoorNav@123` |
 
 ---
 

@@ -3,60 +3,189 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
+interface FormErrors {
+  fullName?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+interface FormTouched {
+  fullName?: boolean;
+  email?: boolean;
+  password?: boolean;
+  confirmPassword?: boolean;
+}
+
+export const validateFullName = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return 'Full name is required.';
+  }
+  if (trimmed.length < 2) {
+    return 'Name must be at least 2 characters.';
+  }
+  if (!/^[A-Za-z\s]+$/.test(trimmed)) {
+    return 'Name can only contain letters and spaces.';
+  }
+  return '';
+};
+
+export const validateEmail = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return 'Email address is required.';
+  }
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(trimmed)) {
+    return 'Please enter a valid email address.';
+  }
+  return '';
+};
+
+export const validatePassword = (value: string): string => {
+  if (!value) {
+    return 'Password is required.';
+  }
+  if (value.length < 8) {
+    return 'Password must be at least 8 characters.';
+  }
+  if (!/[A-Z]/.test(value)) {
+    return 'Password must contain at least one uppercase letter.';
+  }
+  if (!/[a-z]/.test(value)) {
+    return 'Password must contain at least one lowercase letter.';
+  }
+  if (!/[0-9]/.test(value)) {
+    return 'Password must contain at least one number.';
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(value)) {
+    return 'Password must contain at least one special character.';
+  }
+  return '';
+};
+
+export const validateConfirmPassword = (confirmVal: string, passwordVal: string): string => {
+  if (!confirmVal) {
+    return 'Please confirm your password.';
+  }
+  if (confirmVal !== passwordVal) {
+    return 'Passwords do not match.';
+  }
+  return '';
+};
+
 export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  const [errors, setErrors] = useState<{
-    fullName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<FormTouched>({});
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const validate = () => {
-    const tempErrors: typeof errors = {};
-    
-    if (!fullName.trim()) {
-      tempErrors.fullName = 'Full name is required.';
-    }
-    
-    if (!email) {
-      tempErrors.email = 'Email address is required.';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      tempErrors.email = 'Enter a valid email address.';
-    }
-    
-    if (!password) {
-      tempErrors.password = 'Password is required.';
-    } else if (password.length < 6) {
-      tempErrors.password = 'Password must be at least 6 characters.';
-    }
-    
-    if (password !== confirmPassword) {
-      tempErrors.confirmPassword = 'Passwords do not match.';
-    }
+  const handleBlur = (field: keyof FormErrors) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    let err = '';
+    if (field === 'fullName') err = validateFullName(fullName);
+    else if (field === 'email') err = validateEmail(email);
+    else if (field === 'password') err = validatePassword(password);
+    else if (field === 'confirmPassword') err = validateConfirmPassword(confirmPassword, password);
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
+    setErrors((prev) => ({ ...prev, [field]: err }));
+  };
+
+  const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFullName(value);
+    if (touched.fullName) {
+      setErrors((prev) => ({
+        ...prev,
+        fullName: validateFullName(value)
+      }));
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (touched.email) {
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value)
+      }));
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (touched.password) {
+      setErrors((prev) => ({
+        ...prev,
+        password: validatePassword(value)
+      }));
+    }
+    // If confirm password has been touched or has a value, revalidate to clear or update mismatch
+    if (touched.confirmPassword || confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: validateConfirmPassword(confirmPassword, value)
+      }));
+    }
+  };
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    if (touched.confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: validateConfirmPassword(value, password)
+      }));
+    }
   };
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+
+    // Mark all fields as touched upon submission attempt
+    setTouched({
+      fullName: true,
+      email: true,
+      password: true,
+      confirmPassword: true
+    });
+
+    const nameErr = validateFullName(fullName);
+    const emailErr = validateEmail(email);
+    const passErr = validatePassword(password);
+    const confirmErr = validateConfirmPassword(confirmPassword, password);
+
+    const currentErrors: FormErrors = {
+      fullName: nameErr,
+      email: emailErr,
+      password: passErr,
+      confirmPassword: confirmErr
+    };
+
+    setErrors(currentErrors);
+
+    // Prevent submission if any validation fails
+    if (nameErr || emailErr || passErr || confirmErr) {
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError('');
 
     try {
-      const res = await register(fullName, email, password, confirmPassword);
+      const res = await register(fullName.trim(), email.trim(), password, confirmPassword);
       if (res.success) {
         navigate('/profile');
       }
@@ -67,6 +196,18 @@ export default function Register() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getFieldBorderClass = (field: keyof FormErrors) => {
+    const isInvalid = !!(touched[field] && errors[field]);
+    return isInvalid
+      ? 'border-brand-accent-dest focus-within:border-brand-accent-dest bg-red-50/20'
+      : 'border-slate-300 focus-within:border-brand-secondary bg-slate-50 focus-within:bg-white';
+  };
+
+  const getIconClass = (field: keyof FormErrors) => {
+    const isInvalid = !!(touched[field] && errors[field]);
+    return isInvalid ? 'text-brand-accent-dest' : 'text-slate-400';
   };
 
   return (
@@ -85,70 +226,114 @@ export default function Register() {
           </div>
         )}
 
-        <form onSubmit={handleRegisterSubmit} className="space-y-4">
+        <form onSubmit={handleRegisterSubmit} noValidate className="space-y-4">
           
           {/* Full Name */}
           <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Full Name</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
-              <User className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+            <label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
+              Full Name
+            </label>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('fullName')}`}>
+              <User className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('fullName')}`} />
               <input
+                id="fullName"
+                name="fullName"
                 type="text"
                 placeholder="Jane Doe"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={handleFullNameChange}
+                onBlur={() => handleBlur('fullName')}
+                aria-invalid={!!(touched.fullName && errors.fullName)}
+                aria-describedby={touched.fullName && errors.fullName ? 'fullName-error' : undefined}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.fullName && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.fullName}</span>}
+            {touched.fullName && errors.fullName && (
+              <span id="fullName-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+                {errors.fullName}
+              </span>
+            )}
           </div>
 
           {/* Email field */}
           <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Email Address</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
-              <Mail className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+            <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
+              Email Address
+            </label>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('email')}`}>
+              <Mail className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('email')}`} />
               <input
+                id="email"
+                name="email"
                 type="email"
                 placeholder="you@campus.edu"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
+                onBlur={() => handleBlur('email')}
+                aria-invalid={!!(touched.email && errors.email)}
+                aria-describedby={touched.email && errors.email ? 'email-error' : undefined}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.email && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.email}</span>}
+            {touched.email && errors.email && (
+              <span id="email-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+                {errors.email}
+              </span>
+            )}
           </div>
 
           {/* Password field */}
           <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Password</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
-              <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+            <label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
+              Password
+            </label>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('password')}`}>
+              <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('password')}`} />
               <input
+                id="password"
+                name="password"
                 type="password"
-                placeholder="Minimum 6 characters"
+                placeholder="Minimum 8 characters"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
+                onBlur={() => handleBlur('password')}
+                aria-invalid={!!(touched.password && errors.password)}
+                aria-describedby={touched.password && errors.password ? 'password-error' : undefined}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.password && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.password}</span>}
+            {touched.password && errors.password && (
+              <span id="password-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+                {errors.password}
+              </span>
+            )}
           </div>
 
           {/* Confirm Password field */}
           <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Confirm Password</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
-              <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+            <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
+              Confirm Password
+            </label>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('confirmPassword')}`}>
+              <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('confirmPassword')}`} />
               <input
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 placeholder="Re-enter password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={handleConfirmPasswordChange}
+                onBlur={() => handleBlur('confirmPassword')}
+                aria-invalid={!!(touched.confirmPassword && errors.confirmPassword)}
+                aria-describedby={touched.confirmPassword && errors.confirmPassword ? 'confirmPassword-error' : undefined}
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.confirmPassword && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.confirmPassword}</span>}
+            {touched.confirmPassword && errors.confirmPassword && (
+              <span id="confirmPassword-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+                {errors.confirmPassword}
+              </span>
+            )}
           </div>
 
           {/* Submit CTA */}

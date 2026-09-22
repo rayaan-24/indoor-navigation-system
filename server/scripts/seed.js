@@ -414,8 +414,8 @@ const seedDatabase = async () => {
 
     // 2. Seed Users
     const salt = await bcrypt.genSalt(10);
-    const hashedStudentPassword = await bcrypt.hash('123456', salt);
-    const hashedAdminPassword = await bcrypt.hash('123456', salt);
+    const hashedStudentPassword = await bcrypt.hash('IndoorNav@123', salt);
+    const hashedAdminPassword = await bcrypt.hash('IndoorNav@123', salt);
 
     const users = await User.insertMany([
       {

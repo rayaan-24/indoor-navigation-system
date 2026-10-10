@@ -123,7 +123,7 @@ export default function IndoorMap({
           <div className="flex justify-between items-start gap-2">
             <div>
               <div className="flex items-center space-x-1.5">
-                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 font-extrabold text-[10px] rounded">
+                <span className="px-1.5 py-0.5 bg-violet-100 text-violet-800 font-extrabold text-[10px] rounded">
                   {inspectedRoom.id}
                 </span>
                 <h4 className="font-bold text-xs text-brand-primary leading-tight">{inspectedRoom.name}</h4>
@@ -155,7 +155,7 @@ export default function IndoorMap({
                 if (onSetEnd) onSetEnd(inspectedRoom);
                 setInspectedRoom(null);
               }}
-              className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 text-brand-secondary font-bold rounded cursor-pointer transition-colors border border-blue-200"
+              className="flex-1 py-1.5 bg-violet-50 hover:bg-violet-100 text-brand-secondary font-bold rounded cursor-pointer transition-colors border border-violet-200"
             >
               Set Destination
             </button>
@@ -232,9 +232,9 @@ export default function IndoorMap({
                     isStart
                       ? 'fill-emerald-50 stroke-emerald-600 stroke-[3.5]'
                       : isEnd
-                      ? 'fill-blue-50 stroke-blue-600 stroke-[3.5]'
+                      ? 'fill-violet-50 stroke-violet-600 stroke-[3.5]'
                       : isInspected
-                      ? 'fill-blue-50/70 stroke-blue-500 stroke-2'
+                      ? 'fill-violet-50/70 stroke-violet-500 stroke-2'
                       : 'fill-white stroke-slate-300 stroke-1.5 hover:fill-slate-50 hover:stroke-slate-400'
                   }`}
                 />
@@ -249,8 +249,8 @@ export default function IndoorMap({
                     isStart
                       ? 'fill-emerald-900'
                       : isEnd
-                      ? 'fill-blue-900'
-                      : 'fill-slate-800 group-hover:fill-blue-600'
+                      ? 'fill-violet-900'
+                      : 'fill-slate-800 group-hover:fill-violet-600'
                   }`}
                 >
                   {room.id}
@@ -259,7 +259,7 @@ export default function IndoorMap({
                 {/* Destination Badge Indicator inside room */}
                 {isEnd && (
                   <g transform={`translate(${rx + rw - 16}, ${ry + 16})`}>
-                    <circle cx="0" cy="0" r="8" fill="#2563EB" />
+                    <circle cx="0" cy="0" r="8" fill="#7C3AED" />
                     <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" className="text-[7px] font-bold">
                       ★
                     </text>
@@ -269,7 +269,7 @@ export default function IndoorMap({
                 {/* Start Badge Indicator inside room */}
                 {isStart && (
                   <g transform={`translate(${rx + rw - 16}, ${ry + 16})`}>
-                    <circle cx="0" cy="0" r="8" fill="#10B981" />
+                    <circle cx="0" cy="0" r="8" fill="#16A34A" />
                     <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" className="text-[7px] font-bold">
                       ●
                     </text>
@@ -324,8 +324,8 @@ export default function IndoorMap({
                 width={l.width * 12}
                 height={l.height * 12}
                 rx="4"
-                fill="#EFF6FF"
-                stroke="#3B82F6"
+                fill="#F5F3FF"
+                stroke="#8B5CF6"
                 strokeWidth="2"
               />
               <text
@@ -333,7 +333,7 @@ export default function IndoorMap({
                 y={(l.height * 12) / 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-[8px] fill-blue-800 font-extrabold select-none"
+                className="text-[8px] fill-violet-800 font-extrabold select-none"
               >
                 LIFT
               </text>
@@ -376,7 +376,7 @@ export default function IndoorMap({
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
-                stroke="#2563EB"
+                stroke="#7C3AED"
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -388,7 +388,7 @@ export default function IndoorMap({
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
-                stroke="#60A5FA"
+                stroke="#C4B5FD"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -397,13 +397,13 @@ export default function IndoorMap({
 
               {/* Start Door Coordinate Indicator Marker */}
               <g transform={`translate(${routePathPoints[0].x * 12}, ${routePathPoints[0].y * 12})`}>
-                <circle cx="0" cy="0" r="10" fill="#10B981" stroke="#FFFFFF" strokeWidth="2.5" />
+                <circle cx="0" cy="0" r="10" fill="#16A34A" stroke="#FFFFFF" strokeWidth="2.5" />
                 <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
               </g>
 
               {/* Destination Door Coordinate Pin Marker */}
               <g transform={`translate(${routePathPoints[routePathPoints.length - 1].x * 12}, ${routePathPoints[routePathPoints.length - 1].y * 12})`}>
-                <circle cx="0" cy="0" r="10" fill="#EF4444" stroke="#FFFFFF" strokeWidth="2.5" />
+                <circle cx="0" cy="0" r="10" fill="#DC2626" stroke="#FFFFFF" strokeWidth="2.5" />
                 <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
               </g>
             </g>
@@ -438,7 +438,7 @@ export default function IndoorMap({
           <span className="flex items-center">
             <Navigation className="w-3 h-3 text-red-500 mr-1" /> Dest Door
           </span>
-          <span className="flex items-center font-bold text-blue-700">
+          <span className="flex items-center font-bold text-violet-700">
             [SJT GROUND FLOOR - 120m × 94m]
           </span>
         </div>

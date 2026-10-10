@@ -201,21 +201,29 @@ export default function Register() {
 
   const getFieldBorderClass = (field: keyof FormErrors) => {
     const isInvalid = !!(touched[field] && errors[field]);
-    return isInvalid
-      ? 'border-brand-accent-dest focus-within:border-brand-accent-dest bg-red-50/20'
-      : 'border-slate-300 focus-within:border-brand-secondary bg-slate-50 focus-within:bg-white';
+    const isValid = touched[field] && !errors[field];
+    if (isInvalid) {
+      return 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 bg-red-50/20';
+    }
+    if (isValid) {
+      return 'border-emerald-500/80 focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 bg-emerald-50/10';
+    }
+    return 'border-slate-300 focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 bg-slate-50 focus-within:bg-white';
   };
 
   const getIconClass = (field: keyof FormErrors) => {
     const isInvalid = !!(touched[field] && errors[field]);
-    return isInvalid ? 'text-brand-accent-dest' : 'text-slate-400';
+    const isValid = touched[field] && !errors[field];
+    if (isInvalid) return 'text-red-500';
+    if (isValid) return 'text-emerald-600';
+    return 'text-slate-400';
   };
 
   const { register: content } = authContent;
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-md space-y-6">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F8FAFC]">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
         
         {/* Header Title */}
         <div className="text-center">
@@ -224,7 +232,7 @@ export default function Register() {
         </div>
 
         {/* Registration Precautions & Requirements Card */}
-        <div className="p-3.5 bg-blue-50/90 border border-blue-100 rounded-xl text-[11px] text-brand-primary space-y-2">
+        <div className="p-3.5 bg-violet-50/80 border border-violet-100 rounded-xl text-[11px] text-brand-primary space-y-2">
           <p className="font-bold flex items-center text-brand-secondary">
             <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-secondary flex-shrink-0" />
             {content.precautions.title}
@@ -251,7 +259,7 @@ export default function Register() {
             <label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
               {content.fields.fullNameLabel}
             </label>
-            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('fullName')}`}>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-all ${getFieldBorderClass('fullName')}`}>
               <User className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('fullName')}`} />
               <input
                 id="fullName"
@@ -267,7 +275,7 @@ export default function Register() {
               />
             </div>
             {touched.fullName && errors.fullName && (
-              <span id="fullName-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+              <span id="fullName-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.fullName}
               </span>
             )}
@@ -278,7 +286,7 @@ export default function Register() {
             <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
               {content.fields.emailLabel}
             </label>
-            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('email')}`}>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-all ${getFieldBorderClass('email')}`}>
               <Mail className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('email')}`} />
               <input
                 id="email"
@@ -294,7 +302,7 @@ export default function Register() {
               />
             </div>
             {touched.email && errors.email && (
-              <span id="email-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+              <span id="email-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.email}
               </span>
             )}
@@ -305,7 +313,7 @@ export default function Register() {
             <label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
               {content.fields.passwordLabel}
             </label>
-            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('password')}`}>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-all ${getFieldBorderClass('password')}`}>
               <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('password')}`} />
               <input
                 id="password"
@@ -321,7 +329,7 @@ export default function Register() {
               />
             </div>
             {touched.password && errors.password && (
-              <span id="password-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+              <span id="password-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.password}
               </span>
             )}
@@ -332,7 +340,7 @@ export default function Register() {
             <label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-brand-muted">
               {content.fields.confirmPasswordLabel}
             </label>
-            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-colors ${getFieldBorderClass('confirmPassword')}`}>
+            <div className={`relative flex items-center border rounded-lg px-3 py-2 transition-all ${getFieldBorderClass('confirmPassword')}`}>
               <Lock className={`w-4 h-4 mr-2 flex-shrink-0 transition-colors ${getIconClass('confirmPassword')}`} />
               <input
                 id="confirmPassword"
@@ -348,7 +356,7 @@ export default function Register() {
               />
             </div>
             {touched.confirmPassword && errors.confirmPassword && (
-              <span id="confirmPassword-error" role="alert" className="text-[10px] text-brand-accent-dest font-semibold block">
+              <span id="confirmPassword-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.confirmPassword}
               </span>
             )}
@@ -358,7 +366,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow-xs hover:bg-violet-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? content.submittingText : content.submitButton}
           </button>

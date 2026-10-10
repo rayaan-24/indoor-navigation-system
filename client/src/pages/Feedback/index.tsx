@@ -73,7 +73,7 @@ export default function Feedback() {
                     onClick={() => setIssueType(type)}
                     className={`px-4 py-3 rounded-lg border text-xs font-semibold text-left transition-all cursor-pointer ${
                       issueType === type
-                        ? 'bg-blue-50 border-brand-secondary text-brand-primary shadow-sm'
+                        ? 'bg-violet-50 border-brand-secondary text-brand-primary shadow-xs'
                         : 'border-slate-200 hover:bg-slate-50 text-brand-muted hover:border-slate-355 border-slate-300'
                     }`}
                   >
@@ -100,7 +100,7 @@ export default function Feedback() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
+              className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-violet-700 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <Send className="w-4 h-4 mr-2" />
               {loading ? 'Submitting...' : 'Submit Report'}

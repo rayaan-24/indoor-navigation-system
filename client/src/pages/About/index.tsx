@@ -72,7 +72,7 @@ export default function About() {
           {techStack.items.map((tech) => (
             <div key={tech.name} className="bg-slate-50 border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow flex flex-col justify-between">
               <div>
-                <span className="inline-flex items-center justify-center p-1.5 bg-blue-50 text-brand-secondary rounded-lg mb-4">
+                <span className="inline-flex items-center justify-center p-1.5 bg-violet-50 text-brand-secondary rounded-lg mb-4">
                   <Code className="w-4 h-4" />
                 </span>
                 <h4 className="font-bold text-brand-primary text-sm">{tech.name}</h4>

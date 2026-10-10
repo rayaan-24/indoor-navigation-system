@@ -271,7 +271,7 @@ export default function Locations() {
                       <div key={loc.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
                         <div>
                           <div className="flex items-center justify-between mb-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-brand-secondary">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-50 text-brand-secondary">
                               {loc.category}
                             </span>
                             <span className="text-xs text-brand-muted font-medium">Floor {loc.floor === 0 ? 'Ground' : `${loc.floor}st`}</span>
@@ -290,7 +290,7 @@ export default function Locations() {
                         <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
                           <Link
                             to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                            className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
+                            className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
                           >
                             <Navigation className="w-3.5 h-3.5 mr-1" />
                             {locationsContent.buttons.navigateHere}

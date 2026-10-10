@@ -1,16 +1,45 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #0A192F;      /* Deep Navy / Dark Blue */
-  --color-brand-secondary: #2563EB;    /* Clean Blue */
-  --color-brand-accent-dest: #EF4444;  /* Destination Red */
-  --color-brand-accent-loc: #10B981;   /* Success / Current Location */
-  --color-brand-warning: #F59E0B;      /* Warning Amber */
-  --color-brand-bg: #F8FAFC;           /* White / Very Light Gray */
-  --color-brand-text: #1E293B;         /* Dark Navy / Charcoal */
-  --color-brand-muted: #64748B;        /* Neutral Gray */
-  
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-brand-primary: #1E293B;      /* Primary Text: #1E293B */
+  --color-brand-secondary: #7C3AED;    /* Primary Violet: #7C3AED */
+  --color-brand-dark: #5B21B6;         /* Dark Violet: #5B21B6 */
+  --color-brand-light: #EDE9FE;        /* Light Violet: #EDE9FE */
+  --color-brand-accent-dest: #DC2626;  /* Error: #DC2626 */
+  --color-brand-accent-loc: #16A34A;   /* Success: #16A34A */
+  --color-brand-warning: #D97706;      /* Warning: #D97706 */
+  --color-brand-bg: #F8FAFC;           /* Page Background: #F8FAFC */
+  --color-brand-card: #FFFFFF;         /* Card Background: #FFFFFF */
+  --color-brand-text: #1E293B;         /* Primary Text: #1E293B */
+  --color-brand-muted: #64748B;        /* Secondary Text: #64748B */
+  --color-brand-border: #E2E8F0;       /* Borders: #E2E8F0 */
+
+  --color-violet-50: #F5F3FF;
+  --color-violet-100: #EDE9FE;
+  --color-violet-200: #DDD6FE;
+  --color-violet-300: #C4B5FD;
+  --color-violet-400: #A78BFA;
+  --color-violet-500: #8B5CF6;
+  --color-violet-600: #7C3AED;
+  --color-violet-700: #6D28D9;
+  --color-violet-800: #5B21B6;
+  --color-violet-900: #4C1D95;
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  --primary-violet: #7C3AED;
+  --dark-violet: #5B21B6;
+  --light-violet: #EDE9FE;
+  --bg-page: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --border-color: #E2E8F0;
+  --color-success: #16A34A;
+  --color-error: #DC2626;
+  --color-warning: #D97706;
 }
 
 @layer base {
@@ -20,7 +49,7 @@
     color: var(--color-brand-text);
   }
   
-  /* Modern custom scrollbar */
+  /* Modern clean custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -29,10 +58,10 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #CBD5E1;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #94A3B8;
   }
 }

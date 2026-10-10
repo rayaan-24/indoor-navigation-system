@@ -155,7 +155,7 @@ export function AdminBuildings() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-blue-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Building
@@ -290,7 +290,7 @@ export function AdminBuildings() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-blue-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Block'}
                 </button>
@@ -564,7 +564,7 @@ export function AdminRooms() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-blue-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Room
@@ -613,7 +613,7 @@ export function AdminRooms() {
                     <td className="p-4 capitalize">{r.buildingId?.name || 'Block B'}</td>
                     <td className="p-4">Level {r.floor !== undefined ? r.floor : (r.floorId?.floorNumber || 0)}</td>
                     <td className="p-4">
-                      <span className="px-2 py-0.5 rounded bg-blue-50 text-brand-secondary font-bold text-[9px] uppercase">
+                      <span className="px-2 py-0.5 rounded bg-violet-50 text-brand-secondary font-bold text-[9px] uppercase">
                         {r.roomType || 'Office'}
                       </span>
                     </td>
@@ -791,7 +791,7 @@ export function AdminRooms() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-blue-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Room'}
                 </button>
@@ -979,7 +979,7 @@ export function AdminLandmarks() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-blue-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Landmark
@@ -1144,7 +1144,7 @@ export function AdminLandmarks() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-blue-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Landmark'}
                 </button>
@@ -1300,7 +1300,7 @@ export function AdminRoutes() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-blue-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Connection Edge
@@ -1333,7 +1333,7 @@ export function AdminRoutes() {
                     <td className="p-4 font-bold text-slate-500">{item.toNode}</td>
                     <td className="p-4">{item.distance} meters</td>
                     <td className="p-4 capitalize">
-                      <span className="px-2 py-0.5 rounded bg-blue-50 text-brand-secondary font-bold text-[9px]">
+                      <span className="px-2 py-0.5 rounded bg-violet-50 text-brand-secondary font-bold text-[9px]">
                         {item.type}
                       </span>
                     </td>
@@ -1455,7 +1455,7 @@ export function AdminRoutes() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-blue-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
                 >
                   Create Edge
                 </button>
@@ -1589,7 +1589,7 @@ export function AdminUsers() {
                     <td className="p-4 font-bold">{usr.name}</td>
                     <td className="p-4 capitalize">
                       <span className={`px-2.5 py-0.5 rounded font-bold text-[9px] ${
-                        usr.role === 'admin' ? 'bg-red-50 text-brand-accent-dest border border-red-200' : 'bg-blue-50 text-brand-secondary border border-blue-200'
+                        usr.role === 'admin' ? 'bg-red-50 text-brand-accent-dest border border-red-200' : 'bg-violet-50 text-brand-secondary border border-violet-200'
                       }`}>
                         {usr.role === 'admin' ? 'Administrator' : 'Student/User'}
                       </span>
@@ -1746,7 +1746,7 @@ export function AdminReports() {
                         rep.status === 'Resolved'
                           ? 'bg-emerald-50 border-emerald-200 text-brand-accent-loc' 
                           : rep.status === 'In Progress'
-                          ? 'bg-blue-50 border-blue-200 text-brand-secondary' 
+                          ? 'bg-violet-50 border-violet-200 text-brand-secondary' 
                           : 'bg-red-50 border-red-200 text-brand-accent-dest'
                       }`}>
                         {rep.status}
@@ -1756,7 +1756,7 @@ export function AdminReports() {
                       {rep.status === 'Pending' && (
                         <button
                           onClick={() => handleProgress(rep.id)}
-                          className="px-2.5 py-1.5 bg-blue-50 text-brand-secondary rounded font-bold hover:bg-blue-100 text-[10px] cursor-pointer"
+                          className="px-2.5 py-1.5 bg-violet-50 text-brand-secondary rounded font-bold hover:bg-violet-100 text-[10px] cursor-pointer"
                         >
                           Start Review
                         </button>
@@ -1870,7 +1870,7 @@ export function AdminAnalytics() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Runs */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-secondary flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-violet-50 text-brand-secondary flex items-center justify-center flex-shrink-0">
             <Navigation className="w-6 h-6" />
           </div>
           <div>
@@ -1884,7 +1884,7 @@ export function AdminAnalytics() {
 
         {/* Unique Users */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-violet-50 text-brand-secondary flex items-center justify-center flex-shrink-0">
             <Users className="w-6 h-6" />
           </div>
           <div>
@@ -1892,7 +1892,7 @@ export function AdminAnalytics() {
             <p className="text-2xl font-extrabold text-brand-primary mt-0.5">
               {loading ? '...' : `${summary.uniqueUsers} accounts`}
             </p>
-            <p className="text-[10px] text-indigo-600 font-medium mt-0.5">Distinct student & staff users</p>
+            <p className="text-[10px] text-brand-secondary font-medium mt-0.5">Distinct student & staff users</p>
           </div>
         </div>
 
@@ -1986,7 +1986,7 @@ export function AdminAnalytics() {
                           </div>
                         </td>
                         <td className="py-3 text-right font-bold text-brand-primary">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-brand-secondary font-bold">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-violet-50 text-brand-secondary font-bold">
                             {target.requests} runs
                           </span>
                           <span className="text-[10px] text-brand-muted ml-1.5">({percent}%)</span>

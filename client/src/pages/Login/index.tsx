@@ -76,8 +76,8 @@ export default function Login() {
   const { login: content } = authContent;
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-md space-y-6">
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F8FAFC]">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
         
         {/* Header Title */}
         <div className="text-center">
@@ -94,19 +94,19 @@ export default function Login() {
         )}
 
         {/* Credentials Alert */}
-        <div className="p-3 bg-blue-50/80 border border-blue-100 rounded-lg text-[11px] text-brand-primary space-y-2">
+        <div className="p-3 bg-violet-50/80 border border-violet-100 rounded-xl text-[11px] text-brand-primary space-y-2">
           <div>
-            <p className="font-bold flex items-center mb-1">
-              <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1 flex-shrink-0" />
+            <p className="font-bold flex items-center mb-1 text-brand-secondary">
+              <ShieldAlert className="w-3.5 h-3.5 text-brand-secondary mr-1.5 flex-shrink-0" />
               {content.mandatoryAuth.title}
             </p>
-            <p className="text-[10px] text-brand-muted leading-relaxed">
+            <p className="text-[10px] text-slate-600 leading-relaxed">
               {content.mandatoryAuth.description}
             </p>
           </div>
-          <div className="border-t border-blue-100 pt-1.5">
+          <div className="border-t border-violet-100 pt-1.5">
             <p className="font-semibold text-[10px] text-slate-700 mb-1">{content.demoAccounts.title}</p>
-            <ul className="list-disc pl-4 space-y-0.5 text-brand-muted">
+            <ul className="list-disc pl-4 space-y-0.5 text-slate-600">
               <li>{content.demoAccounts.admin.label}: <strong className="text-brand-secondary">{content.demoAccounts.admin.email}</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">{content.demoAccounts.admin.password}</span>)</li>
               <li>{content.demoAccounts.student.label}: <strong className="text-brand-secondary">{content.demoAccounts.student.email}</strong> (pass: <span className="font-mono text-brand-secondary font-semibold">{content.demoAccounts.student.password}</span>)</li>
             </ul>
@@ -123,7 +123,7 @@ export default function Login() {
           {/* Email field */}
           <div className="space-y-1">
             <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">{content.fields.emailLabel}</label>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
+            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 px-3 py-2 bg-slate-50 focus-within:bg-white transition-all">
               <Mail className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="email"
@@ -133,7 +133,7 @@ export default function Login() {
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.email && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.email}</span>}
+            {errors.email && <span className="text-[11px] text-red-600 font-medium block mt-1">{errors.email}</span>}
           </div>
 
           {/* Password field */}
@@ -142,7 +142,7 @@ export default function Login() {
               <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">{content.fields.passwordLabel}</label>
               <a href="#forgot" className="text-[10px] text-brand-secondary hover:underline font-semibold">{content.fields.forgotPasswordText}</a>
             </div>
-            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-brand-secondary px-3 py-2 bg-slate-50 focus-within:bg-white transition-colors">
+            <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 px-3 py-2 bg-slate-50 focus-within:bg-white transition-all">
               <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
                 type="password"
@@ -152,14 +152,14 @@ export default function Login() {
                 className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
               />
             </div>
-            {errors.password && <span className="text-[10px] text-brand-accent-dest font-semibold">{errors.password}</span>}
+            {errors.password && <span className="text-[11px] text-red-600 font-medium block mt-1">{errors.password}</span>}
           </div>
 
           {/* Submit CTA */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow-xs hover:bg-violet-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? content.submittingText : content.submitButton}
           </button>

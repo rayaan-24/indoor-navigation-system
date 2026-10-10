@@ -168,7 +168,7 @@ export default function LocationDetails() {
         <AlertCircle className="w-12 h-12 text-brand-accent-dest mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-brand-primary">Location not found</h2>
         <p className="text-brand-muted text-sm mt-2">{error || 'The room details are not available.'}</p>
-        <Link to="/locations" className="mt-5 inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-blue-700 transition-colors">
+        <Link to="/locations" className="mt-5 inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-colors">
           Back to Directory
         </Link>
       </div>
@@ -206,7 +206,7 @@ export default function LocationDetails() {
             {/* Header info */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-brand-secondary">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-50 text-brand-secondary">
                   {location.category}
                 </span>
                 <span className="text-xs text-brand-muted font-medium">Floor {location.floor === 0 ? 'Ground' : `${location.floor}st`}</span>
@@ -247,7 +247,7 @@ export default function LocationDetails() {
             <div className="flex gap-3">
               <Link
                 to={`/explore?to=${encodeURIComponent(location.name)}`}
-                className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-blue-700 transition-colors cursor-pointer"
+                className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-violet-700 transition-colors cursor-pointer"
               >
                 <Navigation className="w-4 h-4 mr-1.5" />
                 Navigate Here

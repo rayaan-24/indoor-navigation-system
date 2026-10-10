@@ -143,7 +143,7 @@ export default function Profile() {
             <p className="text-xs text-brand-muted flex items-center mt-1">
               <Mail className="w-3.5 h-3.5 mr-1" />
               {user.email}
-              <span className="ml-2.5 px-2 py-0.5 rounded bg-blue-50 text-[10px] text-brand-secondary font-bold capitalize">
+              <span className="ml-2.5 px-2 py-0.5 rounded bg-violet-50 text-[10px] text-brand-secondary font-bold capitalize">
                 {user.role} Account
               </span>
             </p>
@@ -206,7 +206,7 @@ export default function Profile() {
                         <div className="flex items-center space-x-1.5">
                           <Link
                             to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                            className="p-1.5 bg-blue-50 text-brand-secondary rounded hover:bg-blue-100"
+                            className="p-1.5 bg-violet-50 text-brand-secondary rounded hover:bg-violet-100"
                             title="Navigate Here"
                           >
                             <Navigation className="w-3.5 h-3.5" />

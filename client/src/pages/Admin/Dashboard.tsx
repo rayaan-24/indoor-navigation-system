@@ -76,7 +76,7 @@ export default function AdminDashboard() {
   };
 
   const stats = [
-    { label: 'Registered Users', value: usersCount.toString(), icon: <Users className="w-5 h-5 text-blue-600" />, bg: 'bg-blue-50' },
+    { label: 'Registered Users', value: usersCount.toString(), icon: <Users className="w-5 h-5 text-violet-600" />, bg: 'bg-violet-50' },
     { label: 'Rooms Indexed', value: roomsCount.toString(), icon: <DoorOpen className="w-5 h-5 text-emerald-600" />, bg: 'bg-emerald-50' },
     { label: 'Buildings Managed', value: buildings.length.toString(), icon: <Building2 className="w-5 h-5 text-amber-600" />, bg: 'bg-amber-50' },
     { label: 'Total Graph Edges', value: connectionsCount.toString(), icon: <Map className="w-5 h-5 text-purple-600" />, bg: 'bg-purple-50' },
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
                   <span className={`px-2 py-0.5 rounded border font-semibold text-[10px] uppercase ${
                     rep.status === 'Pending' || rep.status === 'pending'
                       ? 'bg-red-50 border-red-200 text-brand-accent-dest' 
-                      : 'bg-blue-50 border-blue-200 text-brand-secondary'
+                      : 'bg-violet-50 border-violet-200 text-brand-secondary'
                   }`}>
                     {rep.status}
                   </span>

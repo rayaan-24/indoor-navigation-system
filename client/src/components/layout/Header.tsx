@@ -44,16 +44,16 @@ export default function Header() {
 
         {/* Desktop Navigation - Only visible when authenticated */}
         {isAuthenticated && (
-          <nav className="hidden md:flex space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex space-x-1 lg:space-x-1.5">
             {headerNavLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  `flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-slate-100 text-brand-secondary'
-                      : 'text-brand-text hover:bg-slate-55/40 hover:text-brand-secondary hover:bg-slate-55'
+                      ? 'bg-violet-50 text-brand-secondary font-semibold shadow-xs'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-brand-secondary'
                   }`
                 }
               >
@@ -71,9 +71,9 @@ export default function Header() {
               {/* User Dropdown/Profile Link */}
               <Link
                 to="/profile"
-                className="flex items-center space-x-2 text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-2 py-1.5 rounded-md hover:bg-slate-50"
+                className="flex items-center space-x-2 text-sm font-medium text-slate-700 hover:text-brand-secondary transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-50"
               >
-                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold border border-slate-300">
+                <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center text-brand-secondary font-bold border border-violet-100 text-xs">
                   {user.name?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span>Profile</span>
@@ -83,16 +83,16 @@ export default function Header() {
               {user.role === 'admin' && (
                 <Link
                   to="/admin"
-                  className="p-2 text-brand-muted hover:text-brand-secondary transition-colors"
+                  className="p-2 text-slate-500 hover:text-brand-secondary hover:bg-slate-50 rounded-lg transition-colors"
                   title="Admin Dashboard"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-4 h-4" />
                 </Link>
               )}
 
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm font-medium text-brand-muted hover:text-brand-accent-dest transition-colors px-2 py-1.5 rounded-md hover:bg-slate-50 cursor-pointer"
+                className="flex items-center text-sm font-medium text-slate-500 hover:text-brand-accent-dest transition-colors px-2.5 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer"
               >
                 <LogOut className="w-4 h-4 mr-1" />
                 <span>Logout</span>
@@ -100,7 +100,7 @@ export default function Header() {
 
               <Link
                 to="/explore"
-                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-blue-700 active:scale-100"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-semibold text-white shadow-xs transition-all hover:bg-violet-700 active:scale-[0.98]"
               >
                 {actionLabels.startNavigation}
               </Link>
@@ -109,13 +109,13 @@ export default function Header() {
             <div className="flex items-center space-x-2">
               <Link
                 to="/login"
-                className="text-sm font-medium text-brand-text hover:text-brand-secondary transition-colors px-3 py-2 rounded-md hover:bg-slate-100"
+                className="text-sm font-medium text-slate-600 hover:text-brand-secondary transition-colors px-3 py-2 rounded-lg hover:bg-slate-50"
               >
                 {actionLabels.login}
               </Link>
               <Link
                 to="/register"
-                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-violet-700 transition-colors"
               >
                 {actionLabels.register}
               </Link>
@@ -126,13 +126,13 @@ export default function Header() {
         {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center space-x-2">
           {isAuthenticated && user?.role === 'admin' && (
-            <Link to="/admin" className="p-1.5 text-brand-muted hover:text-brand-secondary" title={actionLabels.adminDashboard}>
+            <Link to="/admin" className="p-1.5 text-slate-500 hover:text-brand-secondary" title={actionLabels.adminDashboard}>
               <Settings className="w-5 h-5" />
             </Link>
           )}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center justify-center p-2 rounded-md text-brand-text hover:bg-slate-100 hover:text-brand-secondary transition-colors"
+            className="inline-flex items-center justify-center p-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-brand-secondary transition-colors"
             aria-expanded={isOpen}
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -152,10 +152,10 @@ export default function Header() {
                   to={link.path}
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center px-3 py-2.5 rounded-md text-base font-medium transition-colors ${
+                    `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-slate-100 text-brand-secondary'
-                        : 'text-brand-text hover:bg-slate-55'
+                        ? 'bg-violet-50 text-brand-secondary font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-brand-secondary'
                     }`
                   }
                 >
@@ -167,9 +167,9 @@ export default function Header() {
                 <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50 hover:text-brand-secondary"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-brand-secondary"
                 >
-                  <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold">
+                  <div className="w-7 h-7 rounded-full bg-violet-50 flex items-center justify-center text-brand-secondary font-bold text-xs border border-violet-100">
                     {user?.name?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <span>{actionLabels.myProfile}</span>
@@ -179,15 +179,15 @@ export default function Header() {
                     setIsOpen(false);
                     handleLogout();
                   }}
-                  className="flex items-center w-full px-3 py-2.5 rounded-md text-base font-medium text-brand-muted hover:bg-slate-50 hover:text-brand-accent-dest text-left cursor-pointer"
+                  className="flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-brand-accent-dest text-left cursor-pointer"
                 >
-                  <LogOut className="w-5 h-5 mr-3" />
+                  <LogOut className="w-4 h-4 mr-3" />
                   {actionLabels.logout}
                 </button>
                 <Link
                   to="/explore"
                   onClick={() => setIsOpen(false)}
-                  className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                  className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-violet-700"
                 >
                   {actionLabels.startNavigation}
                 </Link>
@@ -198,15 +198,15 @@ export default function Header() {
               <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-brand-text hover:bg-slate-50"
+                className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
-                <User className="w-5 h-5 mr-3" />
+                <User className="w-4 h-4 mr-3" />
                 {actionLabels.login}
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsOpen(false)}
-                className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                className="flex w-full items-center justify-center rounded-lg bg-brand-secondary py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-violet-700"
               >
                 {actionLabels.register}
               </Link>

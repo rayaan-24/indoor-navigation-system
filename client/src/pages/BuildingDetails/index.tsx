@@ -189,7 +189,7 @@ export default function BuildingDetails() {
                     }}
                     className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                       selectedFloor === fl.floorNumber
-                        ? 'bg-white text-brand-primary shadow-sm'
+                        ? 'bg-brand-secondary text-white shadow-xs'
                         : 'text-brand-muted hover:text-brand-primary'
                     }`}
                   >
@@ -259,7 +259,7 @@ export default function BuildingDetails() {
               <div className="flex gap-2 pt-2">
                 <Link
                   to={`/explore?to=${encodeURIComponent(selectedRoom.name)}`}
-                  className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-3 text-xs shadow hover:bg-blue-700 transition-colors"
+                  className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-3 text-xs shadow hover:bg-violet-700 transition-colors"
                 >
                   <Navigation className="w-3.5 h-3.5 mr-1" />
                   Navigate Here
@@ -295,7 +295,7 @@ export default function BuildingDetails() {
                   onClick={() => setSelectedRoom(room)}
                   className={`w-full flex items-center justify-between p-2.5 rounded-lg border text-left transition-all text-xs cursor-pointer ${
                     selectedRoom?.id === room.id
-                      ? 'bg-blue-50 border-brand-secondary text-brand-primary font-bold shadow-sm'
+                      ? 'bg-violet-50 border-brand-secondary text-brand-primary font-bold shadow-xs'
                       : 'border-slate-100 hover:bg-slate-50 text-brand-primary hover:border-slate-200'
                   }`}
                 >

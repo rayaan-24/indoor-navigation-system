@@ -56,7 +56,7 @@ export default function Help() {
           {quickGuide.steps.map((item) => (
             <div key={item.step} className="space-y-2">
               <span className="font-bold text-brand-primary flex items-center">
-                <span className="w-5 h-5 rounded-full bg-blue-50 text-brand-secondary flex items-center justify-center mr-2 font-bold text-xs">{item.step}</span>
+                <span className="w-5 h-5 rounded-full bg-violet-50 text-brand-secondary flex items-center justify-center mr-2 font-bold text-xs">{item.step}</span>
                 {item.title}
               </span>
               <p className="leading-relaxed">{item.description}</p>

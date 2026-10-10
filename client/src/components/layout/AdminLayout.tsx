@@ -34,7 +34,7 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
@@ -45,18 +45,18 @@ export default function AdminLayout() {
 
       {/* Sidebar Component */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-brand-primary text-white transition-transform duration-300 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 border-r border-slate-800 text-white transition-transform duration-300 md:static md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Sidebar Header */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-slate-800">
-          <Link to="/admin" className="flex items-center space-x-2">
+          <Link to="/admin" className="flex items-center space-x-2.5">
             <ShieldAlert className="w-6 h-6 text-brand-secondary" />
-            <span className="text-lg font-bold tracking-wider">IndoorNav Admin</span>
+            <span className="text-base font-bold tracking-wider text-white">IndoorNav Admin</span>
           </Link>
-          <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
-            <X className="w-6 h-6" />
+          <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -69,9 +69,9 @@ export default function AdminLayout() {
               end={item.exact}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-brand-secondary text-white'
+                    ? 'bg-brand-secondary text-white shadow-xs'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`
               }
@@ -86,7 +86,7 @@ export default function AdminLayout() {
         <div className="p-4 border-t border-slate-800">
           <Link
             to="/"
-            className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 rounded-lg hover:bg-slate-700 hover:text-white transition-colors"
+            className="flex items-center justify-center w-full px-4 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Public Site
@@ -98,29 +98,29 @@ export default function AdminLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navbar */}
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-3">
             <button
-              className="p-1 text-slate-55/40 text-slate-500 hover:text-brand-secondary md:hidden"
+              className="p-1.5 text-slate-500 hover:text-brand-secondary md:hidden"
               onClick={() => setSidebarOpen(true)}
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
-            <h2 className="hidden md:block text-lg font-semibold text-brand-primary">Management Console</h2>
+            <h2 className="hidden md:block text-base font-bold text-slate-900">Management Console</h2>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-brand-primary">System Administrator</p>
-              <p className="text-xs text-brand-muted">admin@indoornav.com</p>
+              <p className="text-xs font-bold text-slate-900">System Administrator</p>
+              <p className="text-[10px] text-slate-500">admin@indoornav.com</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-brand-primary font-bold border border-slate-300">
+            <div className="w-9 h-9 rounded-full bg-violet-50 flex items-center justify-center text-brand-secondary font-bold text-xs border border-violet-100">
               A
             </div>
           </div>
         </header>
 
         {/* Content Outlet */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 bg-[#F8FAFC]">
           <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>

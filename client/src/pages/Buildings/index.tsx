@@ -138,7 +138,7 @@ export default function Buildings() {
 
                     <Link
                       to={`/buildings/${building.code}`}
-                      className="inline-flex w-full items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2.5 px-4 text-sm shadow hover:bg-blue-700 transition-colors group cursor-pointer"
+                      className="inline-flex w-full items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2.5 px-4 text-sm shadow hover:bg-violet-700 transition-colors group cursor-pointer"
                     >
                       <span>Explore Floor Plans</span>
                       <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-1" />

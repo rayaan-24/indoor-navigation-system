@@ -81,12 +81,12 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<FormTouched>({});
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -224,7 +224,7 @@ export default function Register() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F8FAFC]">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
-        
+
         {/* Header Title */}
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-brand-primary">{content.title}</h2>
@@ -253,7 +253,7 @@ export default function Register() {
         )}
 
         <form onSubmit={handleRegisterSubmit} noValidate className="space-y-4">
-          
+
           {/* Full Name */}
           <div className="space-y-1">
             <label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-brand-muted">

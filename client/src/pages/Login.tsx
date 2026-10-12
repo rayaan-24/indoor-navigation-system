@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, ShieldAlert } from 'lucide-react';
+import { Mail, Lock, ShieldAlert, Eye, EyeOff, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { authContent } from '../content/authContent';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,13 +36,13 @@ export default function Login() {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       tempErrors.email = 'Enter a valid email address.';
     }
-    
+
     if (!password) {
       tempErrors.password = 'Password is required.';
     } else if (password.length < 6) {
       tempErrors.password = 'Password must be at least 6 characters.';
     }
-    
+
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -78,7 +79,7 @@ export default function Login() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-[#F8FAFC]">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
-        
+
         {/* Header Title */}
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-brand-primary">{content.title}</h2>
@@ -145,14 +146,77 @@ export default function Login() {
             <div className="relative flex items-center border border-slate-300 rounded-lg focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 px-3 py-2 bg-slate-50 focus-within:bg-white transition-all">
               <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={content.fields.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
+                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none pr-7"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="p-1 text-slate-400 hover:text-brand-secondary rounded transition-colors cursor-pointer flex-shrink-0"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
             {errors.password && <span className="text-[11px] text-red-600 font-medium block mt-1">{errors.password}</span>}
+
+            {/* Real-time Password Criteria Checklist */}
+            {password.length > 0 && (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2 mt-2 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                    Password Criteria
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      [
+                        password.length >= 8,
+                        /[A-Z]/.test(password),
+                        /[a-z]/.test(password),
+                        /[0-9]/.test(password),
+                        /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password)
+                      ].every(Boolean)
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-violet-100 text-brand-secondary'
+                    }`}
+                  >
+                    {[
+                      password.length >= 8,
+                      /[A-Z]/.test(password),
+                      /[a-z]/.test(password),
+                      /[0-9]/.test(password),
+                      /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password)
+                    ].filter(Boolean).length} / 5 Met
+                  </span>
+                </div>
+                <ul className="space-y-1">
+                  {[
+                    { id: 'len', label: 'Minimum 8 characters', met: password.length >= 8 },
+                    { id: 'upper', label: 'At least 1 uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+                    { id: 'lower', label: 'At least 1 lowercase letter (a-z)', met: /[a-z]/.test(password) },
+                    { id: 'num', label: 'At least 1 number (0-9)', met: /[0-9]/.test(password) },
+                    { id: 'sym', label: 'At least 1 special symbol (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password) }
+                  ].map((criterion) => (
+                    <li
+                      key={criterion.id}
+                      className={`flex items-center text-[11px] transition-colors ${
+                        criterion.met ? 'text-emerald-700 font-semibold' : 'text-slate-500'
+                      }`}
+                    >
+                      {criterion.met ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600 mr-1.5 flex-shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2 ml-1 flex-shrink-0" />
+                      )}
+                      <span>{criterion.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Submit CTA */}

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Navigation, MapPin, Building2, Clock, ArrowLeft, Heart, CheckCircle, AlertCircle } from 'lucide-react';
-import { getRoomById } from '../../services/roomService';
-import { getLandmarks } from '../../services/landmarkService';
-import { getFavorites, createFavorite, deleteFavorite } from '../../services/favoriteService';
-import { useAuth } from '../../context/AuthContext';
-import IndoorMap from '../../components/map/IndoorMap';
-import type { Location } from '../../types';
+import { getRoomById } from '../services/roomService';
+import { getLandmarks } from '../services/landmarkService';
+import { getFavorites, createFavorite, deleteFavorite } from '../services/favoriteService';
+import { useAuth } from '../context/AuthContext';
+import IndoorMap from '../components/IndoorMap';
+import type { Location } from '../types';
 
 export default function LocationDetails() {
   const { id } = useParams<{ id: string }>();

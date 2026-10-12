@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { ZoomIn, ZoomOut, RotateCcw, Info, MapPin, Navigation } from 'lucide-react';
-import type { Location } from '../../types';
+import type { Location } from '../types';
 
 interface IndoorMapProps {
   buildingId: string;

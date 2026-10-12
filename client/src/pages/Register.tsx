@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { authContent } from '../../content/authContent';
+import { useAuth } from '../context/AuthContext';
+import { authContent } from '../content/authContent';
 
 interface FormErrors {
   fullName?: string;

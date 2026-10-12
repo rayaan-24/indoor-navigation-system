@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, Compass, Layers, Accessibility, ArrowRight, Building2, MapPin, Award } from 'lucide-react';
-import { getBuildings } from '../../services/buildingService';
-import { getRooms, searchLocations } from '../../services/roomService';
-import { homeContent } from '../../content/homeContent';
-import type { Location } from '../../types';
+import { getBuildings } from '../services/buildingService';
+import { getRooms, searchLocations } from '../services/roomService';
+import { homeContent } from '../content/homeContent';
+import type { Location } from '../types';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');

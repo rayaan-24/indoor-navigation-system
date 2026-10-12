@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MapPin, Navigation, CheckCircle2, Compass } from 'lucide-react';
-import { getBuildings, getBuildingLayout } from '../../services/buildingService';
-import { calculateRoute } from '../../services/navigationService';
-import { createHistory } from '../../services/historyService';
-import { useAuth } from '../../context/AuthContext';
-import IndoorMap from '../../components/map/IndoorMap';
-import { exploreContent } from '../../content/exploreContent';
-import type { Location } from '../../types';
+import { getBuildings, getBuildingLayout } from '../services/buildingService';
+import { calculateRoute } from '../services/navigationService';
+import { createHistory } from '../services/historyService';
+import { useAuth } from '../context/AuthContext';
+import IndoorMap from '../components/IndoorMap';
+import { exploreContent } from '../content/exploreContent';
+import type { Location } from '../types';
 
 export default function Explore() {
   const [searchParams] = useSearchParams();

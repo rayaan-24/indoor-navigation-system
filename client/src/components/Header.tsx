@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { MapPin, Menu, X, User, LogOut, Compass, Building2, Search, Settings, Info, HelpCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { siteConfig } from '../../config/siteConfig';
-import { headerNavLinks, actionLabels } from '../../config/navigation';
+import { useAuth } from '../context/AuthContext';
+import { siteConfig } from '../config/siteConfig';
+import { headerNavLinks, actionLabels } from '../config/navigation';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);

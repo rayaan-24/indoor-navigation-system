@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "client-install": "npm install --prefix client",
-    "server-install": "npm install --prefix server",
-    "install-all": "npm run client-install && npm run server-install",
+    "backend-install": "npm install --prefix backend",
+    "server-install": "npm install --prefix backend",
+    "install-all": "npm run client-install && npm run backend-install",
     "client": "npm run dev --prefix client",
-    "server": "npm run dev --prefix server",
-    "dev": "concurrently \"npm run client\" \"npm run server\"",
-    "seed": "node server/scripts/seed.js",
-    "validate-map": "node server/scripts/validateMap.js"
+    "backend": "npm run dev --prefix backend",
+    "server": "npm run dev --prefix backend",
+    "dev": "concurrently \"npm run client\" \"npm run backend\"",
+    "seed": "node backend/scripts/seed.js",
+    "validate-map": "node backend/scripts/validateMap.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

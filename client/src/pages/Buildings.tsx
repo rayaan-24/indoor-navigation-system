@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Layers, MapPin, ArrowRight, AlertCircle } from 'lucide-react';
-import { getBuildings } from '../../services/buildingService';
+import { getBuildings } from '../services/buildingService';
 
 interface BuildingBackendData {
   _id: string;

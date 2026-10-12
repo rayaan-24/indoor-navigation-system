@@ -1,5 +1,5 @@
 import { Compass, Cpu, Code, HelpCircle } from 'lucide-react';
-import { aboutContent } from '../../content/aboutContent';
+import { aboutContent } from '../content/aboutContent';
 
 export default function About() {
   const { hero, problem, solution, roadmap, techStack } = aboutContent;

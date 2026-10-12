@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Building2, Filter, Eye, Navigation, RotateCcw, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { getBuildings } from '../../services/buildingService';
-import { getRooms } from '../../services/roomService';
-import { getLandmarks } from '../../services/landmarkService';
-import { locationsContent } from '../../content/locationsContent';
-import type { LocationCategory, Location } from '../../types';
+import { getBuildings } from '../services/buildingService';
+import { getRooms } from '../services/roomService';
+import { getLandmarks } from '../services/landmarkService';
+import { locationsContent } from '../content/locationsContent';
+import type { LocationCategory, Location } from '../types';
 
 export default function Locations() {
   const [buildings, setBuildings] = useState<any[]>([]);

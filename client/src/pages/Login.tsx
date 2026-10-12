@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, ShieldAlert } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { authContent } from '../../content/authContent';
+import { useAuth } from '../context/AuthContext';
+import { authContent } from '../content/authContent';
 
 export default function Login() {
   const [email, setEmail] = useState('');

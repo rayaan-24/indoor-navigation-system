@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Heart, History, Navigation, Eye, LogOut, Settings, ArrowRight } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { getRooms } from '../../services/roomService';
-import { getLandmarks } from '../../services/landmarkService';
-import { getFavorites, deleteFavorite } from '../../services/favoriteService';
-import { getHistory, clearHistory } from '../../services/historyService';
-import type { HistoryItem, Location } from '../../types';
+import { useAuth } from '../context/AuthContext';
+import { getRooms } from '../services/roomService';
+import { getLandmarks } from '../services/landmarkService';
+import { getFavorites, deleteFavorite } from '../services/favoriteService';
+import { getHistory, clearHistory } from '../services/historyService';
+import type { HistoryItem, Location } from '../types';
 
 export default function Profile() {
   const navigate = useNavigate();

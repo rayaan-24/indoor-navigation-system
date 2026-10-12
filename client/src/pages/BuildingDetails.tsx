@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Layers, MapPin, Navigation, Eye, Clipboard, AlertCircle } from 'lucide-react';
-import { getBuildingById, getBuildingFloors, getBuildingRooms } from '../../services/buildingService';
-import { getLandmarks } from '../../services/landmarkService';
-import IndoorMap from '../../components/map/IndoorMap';
-import type { Location } from '../../types';
+import { getBuildingById, getBuildingFloors, getBuildingRooms } from '../services/buildingService';
+import { getLandmarks } from '../services/landmarkService';
+import IndoorMap from '../components/IndoorMap';
+import type { Location } from '../types';
 
 interface BuildingBackendData {
   _id: string;

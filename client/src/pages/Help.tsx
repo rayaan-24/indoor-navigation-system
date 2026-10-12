@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
-import { helpContent } from '../../content/helpContent';
+import { helpContent } from '../content/helpContent';
 
 interface FAQItemProps {
   question: string;

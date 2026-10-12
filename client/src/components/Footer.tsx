@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Mail, Phone, Map } from 'lucide-react';
-import { siteConfig } from '../../config/siteConfig';
-import { footerNavGroups } from '../../config/navigation';
-import { footerContent } from '../../content/footerContent';
+import { siteConfig } from '../config/siteConfig';
+import { footerNavGroups } from '../config/navigation';
+import { footerContent } from '../content/footerContent';
 
 export default function Footer() {
   const currentYear = siteConfig.copyrightYear;

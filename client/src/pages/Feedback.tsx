@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, CheckCircle2, MessageSquare, ArrowLeft } from 'lucide-react';
-import { createFeedback } from '../../services/feedbackService';
-import type { FeedbackReport } from '../../types';
+import { createFeedback } from '../services/feedbackService';
+import type { FeedbackReport } from '../types';
 
 export default function Feedback() {
   const [issueType, setIssueType] = useState<FeedbackReport['type']>('Incorrect room');

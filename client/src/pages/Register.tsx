@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck, Eye, EyeOff, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { authContent } from '../content/authContent';
 
@@ -81,6 +81,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<FormTouched>({});
@@ -318,20 +320,83 @@ export default function Register() {
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={content.fields.passwordPlaceholder}
                 value={password}
                 onChange={handlePasswordChange}
                 onBlur={() => handleBlur('password')}
                 aria-invalid={!!(touched.password && errors.password)}
                 aria-describedby={touched.password && errors.password ? 'password-error' : undefined}
-                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
+                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none pr-7"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="p-1 text-slate-400 hover:text-brand-secondary rounded transition-colors cursor-pointer flex-shrink-0"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
             {touched.password && errors.password && (
               <span id="password-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.password}
               </span>
+            )}
+
+            {/* Real-time Password Criteria Checklist */}
+            {password.length > 0 && (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2 mt-2 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                    Password Criteria
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      [
+                        password.length >= 8,
+                        /[A-Z]/.test(password),
+                        /[a-z]/.test(password),
+                        /[0-9]/.test(password),
+                        /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password)
+                      ].every(Boolean)
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-violet-100 text-brand-secondary'
+                    }`}
+                  >
+                    {[
+                      password.length >= 8,
+                      /[A-Z]/.test(password),
+                      /[a-z]/.test(password),
+                      /[0-9]/.test(password),
+                      /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password)
+                    ].filter(Boolean).length} / 5 Met
+                  </span>
+                </div>
+                <ul className="space-y-1">
+                  {[
+                    { id: 'len', label: 'Minimum 8 characters', met: password.length >= 8 },
+                    { id: 'upper', label: 'At least 1 uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+                    { id: 'lower', label: 'At least 1 lowercase letter (a-z)', met: /[a-z]/.test(password) },
+                    { id: 'num', label: 'At least 1 number (0-9)', met: /[0-9]/.test(password) },
+                    { id: 'sym', label: 'At least 1 special symbol (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password) }
+                  ].map((criterion) => (
+                    <li
+                      key={criterion.id}
+                      className={`flex items-center text-[11px] transition-colors ${
+                        criterion.met ? 'text-emerald-700 font-semibold' : 'text-slate-500'
+                      }`}
+                    >
+                      {criterion.met ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600 mr-1.5 flex-shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2 ml-1 flex-shrink-0" />
+                      )}
+                      <span>{criterion.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
 
@@ -345,19 +410,32 @@ export default function Register() {
               <input
                 id="confirmPassword"
                 name="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder={content.fields.confirmPasswordPlaceholder}
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
                 onBlur={() => handleBlur('confirmPassword')}
                 aria-invalid={!!(touched.confirmPassword && errors.confirmPassword)}
                 aria-describedby={touched.confirmPassword && errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none"
+                className="w-full text-xs text-brand-primary bg-transparent focus:outline-none pr-7"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                className="p-1 text-slate-400 hover:text-brand-secondary rounded transition-colors cursor-pointer flex-shrink-0"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
             {touched.confirmPassword && errors.confirmPassword && (
               <span id="confirmPassword-error" role="alert" className="text-[11px] text-red-600 font-medium block mt-1">
                 {errors.confirmPassword}
+              </span>
+            )}
+            {confirmPassword.length > 0 && password === confirmPassword && (
+              <span className="text-[11px] text-emerald-600 font-medium flex items-center mt-1">
+                <Check className="w-3.5 h-3.5 mr-1" /> Passwords match
               </span>
             )}
           </div>

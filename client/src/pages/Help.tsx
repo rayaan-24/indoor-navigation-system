@@ -48,7 +48,7 @@ export default function Help() {
       {/* Quick Guide */}
       <section className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-6">
         <h3 className="text-lg font-bold text-brand-primary flex items-center border-b border-slate-100 pb-3">
-          <BookOpen className="w-5 h-5 text-brand-secondary mr-2" />
+          <BookOpen className="w-5 h-5 text-amber-600 mr-2" />
           <span>{quickGuide.title}</span>
         </h3>
         
@@ -56,7 +56,7 @@ export default function Help() {
           {quickGuide.steps.map((item) => (
             <div key={item.step} className="space-y-2">
               <span className="font-bold text-brand-primary flex items-center">
-                <span className="w-5 h-5 rounded-full bg-violet-50 text-brand-secondary flex items-center justify-center mr-2 font-bold text-xs">{item.step}</span>
+                <span className="w-5 h-5 rounded-full bg-yellow-100 text-amber-900 border border-yellow-300 flex items-center justify-center mr-2 font-bold text-xs">{item.step}</span>
                 {item.title}
               </span>
               <p className="leading-relaxed">{item.description}</p>
@@ -68,7 +68,7 @@ export default function Help() {
       {/* FAQs Section */}
       <section className="space-y-4">
         <h3 className="text-xl font-bold text-brand-primary flex items-center mb-6">
-          <HelpCircle className="w-5 h-5 text-brand-secondary mr-2" />
+          <HelpCircle className="w-5 h-5 text-amber-600 mr-2" />
           <span>{faqs.title}</span>
         </h3>
 

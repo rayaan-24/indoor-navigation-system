@@ -93,13 +93,13 @@ export default function Home() {
           
           {/* Hero Left Content */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center space-x-2 bg-violet-50 text-brand-secondary px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase">
-              <Award className="w-4 h-4" />
+            <div className="inline-flex items-center space-x-2 bg-yellow-100 text-amber-900 border border-yellow-300 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">
+              <Award className="w-4 h-4 text-amber-600" />
               <span>{homeContent.hero.badge}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-primary leading-tight">
               {homeContent.hero.titleLine1} <br />
-              <span className="text-brand-secondary">{homeContent.hero.titleLine2}</span>
+              <span className="text-amber-600">{homeContent.hero.titleLine2}</span>
             </h1>
             <p className="text-lg text-brand-muted max-w-lg leading-relaxed">
               {homeContent.hero.subtitle}
@@ -109,14 +109,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Link
                 to="/explore"
-                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-6 py-3.5 text-base font-semibold text-white shadow-md hover:bg-violet-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-secondary px-6 py-3.5 text-base font-bold text-slate-900 shadow-md hover:bg-yellow-600 transition-colors"
               >
                 {homeContent.hero.ctaPrimary}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <Link
                 to="/buildings"
-                className="inline-flex items-center justify-center rounded-lg border border-slate-250 bg-white px-6 py-3.5 text-base font-semibold text-brand-primary hover:bg-slate-50 transition-colors border-slate-200"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-6 py-3.5 text-base font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
               >
                 {homeContent.hero.ctaSecondary}
               </Link>
@@ -124,7 +124,7 @@ export default function Home() {
 
             {/* Quick Search */}
             <form onSubmit={handleSearchSubmit} className="relative max-w-md pt-4">
-              <div className="flex items-center border border-slate-300 rounded-xl bg-white shadow-sm overflow-hidden focus-within:border-brand-secondary focus-within:ring-1 focus-within:ring-brand-secondary transition-all">
+              <div className="flex items-center border border-slate-300 rounded-xl bg-white shadow-sm overflow-hidden focus-within:border-yellow-500 focus-within:ring-2 focus-within:ring-yellow-400/20 transition-all">
                 <Search className="w-5 h-5 text-brand-muted ml-4 flex-shrink-0" />
                 <input
                   type="text"
@@ -148,7 +148,7 @@ export default function Home() {
                       <div>
                         <div className="flex items-center space-x-2">
                           {loc.roomNumber && (
-                            <span className="px-1.5 py-0.5 bg-violet-100 text-violet-800 font-extrabold text-[10px] rounded">
+                            <span className="px-1.5 py-0.5 bg-yellow-100 text-amber-900 font-extrabold text-[10px] rounded border border-yellow-300">
                               {loc.roomNumber}
                             </span>
                           )}
@@ -158,7 +158,7 @@ export default function Home() {
                           {loc.building} • Floor {loc.floorNumber === 0 ? 'Ground' : `${loc.floorNumber}`} {loc.department ? `• ${loc.department}` : ''}
                         </p>
                       </div>
-                      <span className="text-[9px] font-bold text-brand-secondary bg-violet-50 px-2 py-0.5 rounded-full capitalize">
+                      <span className="text-[9px] font-bold text-amber-900 bg-yellow-100 border border-yellow-300 px-2 py-0.5 rounded-full capitalize">
                         {loc.category}
                       </span>
                     </button>
@@ -170,7 +170,7 @@ export default function Home() {
 
           {/* Hero Right Visual */}
           <div className="lg:col-span-6 flex justify-center relative">
-            <div className="absolute w-72 h-72 bg-violet-100/50 rounded-full blur-3xl -top-12 -left-12 z-0"></div>
+            <div className="absolute w-72 h-72 bg-yellow-200/40 rounded-full blur-3xl -top-12 -left-12 z-0"></div>
             <div className="absolute w-72 h-72 bg-slate-100/60 rounded-full blur-3xl -bottom-12 -right-12 z-0"></div>
 
             {/* Custom vector architectural map mockup */}
@@ -190,7 +190,7 @@ export default function Home() {
                   <circle cx="300" cy="150" r="4" fill="#475569" />
                   
                   {/* Glowing dynamic navigation path */}
-                  <path d="M 80,100 L 220,100 L 220,50 L 350,50" fill="none" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" className="animate-[dash_8s_linear_infinite]" strokeDasharray="8 6" />
+                  <path d="M 80,100 L 220,100 L 220,50 L 350,50" fill="none" stroke="#eab308" strokeWidth="3.5" strokeLinecap="round" className="animate-[dash_8s_linear_infinite]" strokeDasharray="8 6" />
                   <circle cx="80" cy="100" r="6" fill="#10b981" />
                   <circle cx="350" cy="50" r="6" fill="#ef4444" />
                 </svg>
@@ -199,7 +199,7 @@ export default function Home() {
                 <div className="absolute top-8 left-12 bg-slate-800/90 text-[8px] font-bold text-white px-2 py-0.5 rounded border border-slate-700">
                   YOU (B-Entrance)
                 </div>
-                <div className="absolute bottom-8 right-12 bg-brand-secondary/90 text-[8px] font-bold text-white px-2 py-0.5 rounded border border-slate-700">
+                <div className="absolute bottom-8 right-12 bg-yellow-500 text-[8px] font-bold text-slate-950 px-2 py-0.5 rounded border border-yellow-400">
                   DEST (B-Lab 204)
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function Home() {
               const IconComp = idx === 0 ? Compass : idx === 1 ? Layers : Accessibility;
               return (
                 <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-8 space-y-4 hover:shadow-md transition-shadow">
-                  <div className="h-12 w-12 bg-violet-50 text-brand-secondary rounded-xl flex items-center justify-center">
+                  <div className="h-12 w-12 bg-yellow-100 text-amber-900 rounded-xl flex items-center justify-center border border-yellow-300">
                     <IconComp className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-brand-primary">{feat.title}</h3>
@@ -252,7 +252,7 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-brand-primary">{homeContent.popularDestinations.title}</h2>
                 <p className="text-brand-muted text-sm">{homeContent.popularDestinations.subtitle}</p>
               </div>
-              <Link to="/locations" className="text-sm font-semibold text-brand-secondary hover:text-violet-700 flex items-center">
+              <Link to="/locations" className="text-sm font-bold text-amber-800 hover:text-amber-950 flex items-center">
                 {homeContent.popularDestinations.viewAllButton}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
@@ -263,12 +263,12 @@ export default function Home() {
                 <div key={loc.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-lg hover:border-slate-300 transition-all group animate-fade-in">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-50 text-brand-secondary">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-amber-900 border border-yellow-300">
                         {loc.category}
                       </span>
                       <span className="text-xs text-brand-muted font-medium">Floor {loc.floor === 0 ? 'Ground' : `${loc.floor}st`}</span>
                     </div>
-                    <h3 className="text-lg font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">{loc.name}</h3>
+                    <h3 className="text-lg font-bold text-brand-primary group-hover:text-amber-700 transition-colors">{loc.name}</h3>
                     <p className="text-xs text-brand-muted mt-1 flex items-center">
                       <Building2 className="w-3.5 h-3.5 mr-1 text-slate-400" />
                       <span className="capitalize">{loc.buildingId?.replace('-', ' ')}</span>
@@ -278,7 +278,7 @@ export default function Home() {
                   <div className="mt-6 flex items-center gap-2">
                     <Link
                       to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                      className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+                      className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2 text-xs font-bold text-slate-900 hover:bg-yellow-600 transition-colors shadow-sm"
                     >
                       Navigate
                     </Link>
@@ -305,7 +305,7 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-brand-primary">{homeContent.campusBuildings.title}</h2>
                 <p className="text-brand-muted text-sm">{homeContent.campusBuildings.subtitle}</p>
               </div>
-              <Link to="/buildings" className="text-sm font-semibold text-brand-secondary hover:text-violet-700 flex items-center">
+              <Link to="/buildings" className="text-sm font-bold text-amber-800 hover:text-amber-950 flex items-center">
                 {homeContent.campusBuildings.viewBuildingsButton}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>

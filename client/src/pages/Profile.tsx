@@ -135,15 +135,15 @@ export default function Profile() {
       {/* Profile Header card */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-            <User className="w-8 h-8 text-brand-secondary" />
+          <div className="w-16 h-16 rounded-full bg-yellow-50 flex items-center justify-center border border-yellow-200">
+            <User className="w-8 h-8 text-amber-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-brand-primary">{user.name}</h1>
             <p className="text-xs text-brand-muted flex items-center mt-1">
               <Mail className="w-3.5 h-3.5 mr-1" />
               {user.email}
-              <span className="ml-2.5 px-2 py-0.5 rounded bg-violet-50 text-[10px] text-brand-secondary font-bold capitalize">
+              <span className="ml-2.5 px-2 py-0.5 rounded bg-yellow-100 text-[10px] text-amber-900 border border-yellow-300 font-bold capitalize">
                 {user.role} Account
               </span>
             </p>
@@ -154,7 +154,7 @@ export default function Profile() {
           {user.role === 'admin' && (
             <Link
               to="/admin"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-250 bg-white px-4 py-2 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors border-slate-200"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-brand-primary hover:bg-slate-50 transition-colors"
             >
               <Settings className="w-4 h-4 mr-1.5" />
               Admin Portal
@@ -206,7 +206,7 @@ export default function Profile() {
                         <div className="flex items-center space-x-1.5">
                           <Link
                             to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                            className="p-1.5 bg-violet-50 text-brand-secondary rounded hover:bg-violet-100"
+                            className="p-1.5 bg-yellow-100 text-amber-900 border border-yellow-300 rounded hover:bg-yellow-200"
                             title="Navigate Here"
                           >
                             <Navigation className="w-3.5 h-3.5" />

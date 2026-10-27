@@ -73,8 +73,8 @@ export default function Feedback() {
                     onClick={() => setIssueType(type)}
                     className={`px-4 py-3 rounded-lg border text-xs font-semibold text-left transition-all cursor-pointer ${
                       issueType === type
-                        ? 'bg-violet-50 border-brand-secondary text-brand-primary shadow-xs'
-                        : 'border-slate-200 hover:bg-slate-50 text-brand-muted hover:border-slate-355 border-slate-300'
+                        ? 'bg-yellow-100 border-yellow-500 text-amber-950 font-bold shadow-xs'
+                        : 'border-slate-200 hover:bg-slate-50 text-brand-muted hover:border-slate-300'
                     }`}
                   >
                     {type}
@@ -91,7 +91,7 @@ export default function Feedback() {
                 rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 px-4 py-3 text-xs text-brand-primary focus:outline-none focus:border-brand-secondary bg-slate-50 focus:bg-white transition-colors"
+                className="w-full rounded-lg border border-slate-300 px-4 py-3 text-xs text-brand-primary focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-400/20 bg-slate-50 focus:bg-white transition-colors"
               />
               {error && <span className="text-[10px] text-brand-accent-dest font-semibold">{error}</span>}
             </div>
@@ -100,7 +100,7 @@ export default function Feedback() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow hover:bg-violet-700 transition-colors disabled:opacity-50 cursor-pointer"
+              className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-3 px-4 text-sm shadow hover:bg-yellow-600 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <Send className="w-4 h-4 mr-2" />
               {loading ? 'Submitting...' : 'Submit Report'}

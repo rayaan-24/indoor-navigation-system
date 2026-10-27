@@ -91,7 +91,7 @@ export default function IndoorMap({
 
   return (
     <div className="relative w-full h-[640px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col select-none">
-      
+
       {/* Map Control Toolbar */}
       <div className="absolute top-4 right-4 z-20 flex flex-col bg-white rounded-lg shadow-md border border-slate-200 p-1 space-y-1">
         <button
@@ -123,7 +123,7 @@ export default function IndoorMap({
           <div className="flex justify-between items-start gap-2">
             <div>
               <div className="flex items-center space-x-1.5">
-                <span className="px-1.5 py-0.5 bg-violet-100 text-violet-800 font-extrabold text-[10px] rounded">
+                <span className="px-1.5 py-0.5 bg-yellow-100 text-amber-900 border border-yellow-300 font-extrabold text-[10px] rounded">
                   {inspectedRoom.id}
                 </span>
                 <h4 className="font-bold text-xs text-brand-primary leading-tight">{inspectedRoom.name}</h4>
@@ -155,7 +155,7 @@ export default function IndoorMap({
                 if (onSetEnd) onSetEnd(inspectedRoom);
                 setInspectedRoom(null);
               }}
-              className="flex-1 py-1.5 bg-violet-50 hover:bg-violet-100 text-brand-secondary font-bold rounded cursor-pointer transition-colors border border-violet-200"
+              className="flex-1 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-amber-900 font-bold rounded cursor-pointer transition-colors border border-yellow-300"
             >
               Set Destination
             </button>
@@ -176,7 +176,7 @@ export default function IndoorMap({
       >
         {/* Dynamic Zoom & Pan Group wrapper */}
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}>
-          
+
           {/* Background Grid Pattern */}
           <defs>
             <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
@@ -208,7 +208,7 @@ export default function IndoorMap({
             // Room dimensions (scaled 1 unit = 12 pixels)
             const rx = room.coordinates.x * 12;
             const ry = room.coordinates.y * 12;
-            
+
             const rawRoom = locations.find(l => l.id === room.id) as any;
             const rw = (rawRoom?.width || 8.0) * 12;
             const rh = (rawRoom?.height || 10.0) * 12;
@@ -228,30 +228,28 @@ export default function IndoorMap({
                   width={rw}
                   height={rh}
                   rx="6"
-                  className={`transition-all duration-200 ${
-                    isStart
+                  className={`transition-all duration-200 ${isStart
                       ? 'fill-emerald-50 stroke-emerald-600 stroke-[3.5]'
                       : isEnd
-                      ? 'fill-violet-50 stroke-violet-600 stroke-[3.5]'
-                      : isInspected
-                      ? 'fill-violet-50/70 stroke-violet-500 stroke-2'
-                      : 'fill-white stroke-slate-300 stroke-1.5 hover:fill-slate-50 hover:stroke-slate-400'
-                  }`}
+                        ? 'fill-yellow-50 stroke-yellow-500 stroke-[3.5]'
+                        : isInspected
+                          ? 'fill-yellow-50/80 stroke-yellow-500 stroke-2'
+                          : 'fill-white stroke-slate-300 stroke-1.5 hover:fill-slate-50 hover:stroke-slate-400'
+                    }`}
                 />
-                
+
                 {/* Centered Room ID Label */}
                 <text
                   x={rx + rw / 2}
                   y={ry + rh / 2}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className={`text-[10px] font-extrabold select-none ${
-                    isStart
+                  className={`text-[10px] font-extrabold select-none ${isStart
                       ? 'fill-emerald-900'
                       : isEnd
-                      ? 'fill-violet-900'
-                      : 'fill-slate-800 group-hover:fill-violet-600'
-                  }`}
+                        ? 'fill-amber-950'
+                        : 'fill-slate-800 group-hover:fill-amber-600'
+                    }`}
                 >
                   {room.id}
                 </text>
@@ -259,8 +257,8 @@ export default function IndoorMap({
                 {/* Destination Badge Indicator inside room */}
                 {isEnd && (
                   <g transform={`translate(${rx + rw - 16}, ${ry + 16})`}>
-                    <circle cx="0" cy="0" r="8" fill="#7C3AED" />
-                    <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF" className="text-[7px] font-bold">
+                    <circle cx="0" cy="0" r="8" fill="#EAB308" />
+                    <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" fill="#0F172A" className="text-[7px] font-bold">
                       ★
                     </text>
                   </g>
@@ -324,8 +322,8 @@ export default function IndoorMap({
                 width={l.width * 12}
                 height={l.height * 12}
                 rx="4"
-                fill="#F5F3FF"
-                stroke="#8B5CF6"
+                fill="#FEFCE8"
+                stroke="#EAB308"
                 strokeWidth="2"
               />
               <text
@@ -333,7 +331,7 @@ export default function IndoorMap({
                 y={(l.height * 12) / 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-[8px] fill-violet-800 font-extrabold select-none"
+                className="text-[8px] fill-amber-900 font-extrabold select-none"
               >
                 LIFT
               </text>
@@ -342,8 +340,8 @@ export default function IndoorMap({
 
           {/* 6. Exits Block Boxes */}
           {exits.map((e) => (
-            <g 
-              key={e.exitId} 
+            <g
+              key={e.exitId}
               transform={`translate(${e.x * 12}, ${e.y * 12})`}
               className="cursor-pointer group"
               onClick={() => onRoomClick?.({ id: e.exitId, name: e.name, category: 'Exit', buildingId, floor, description: e.name, coordinates: { x: e.x, y: e.y } })}
@@ -376,19 +374,19 @@ export default function IndoorMap({
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
-                stroke="#7C3AED"
+                stroke="#EAB308"
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray="14, 8"
                 className="animate-[dash_3.5s_linear_infinite]"
               />
-              
+
               {/* Inner crisp line */}
               <polyline
                 points={routePathPoints.map((p) => `${p.x * 12},${p.y * 12}`).join(' ')}
                 fill="none"
-                stroke="#C4B5FD"
+                stroke="#FEF08A"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -438,7 +436,7 @@ export default function IndoorMap({
           <span className="flex items-center">
             <Navigation className="w-3 h-3 text-red-500 mr-1" /> Dest Door
           </span>
-          <span className="flex items-center font-bold text-violet-700">
+          <span className="flex items-center font-bold text-amber-800">
             [SJT GROUND FLOOR - 120m × 94m]
           </span>
         </div>

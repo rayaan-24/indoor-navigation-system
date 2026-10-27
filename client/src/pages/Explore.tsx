@@ -474,7 +474,7 @@ export default function Explore() {
                         className="w-full px-3.5 py-2.5 hover:bg-slate-50 text-left transition-colors cursor-pointer"
                       >
                         <div className="flex items-center space-x-2">
-                          <span className="px-1.5 py-0.5 bg-violet-100 text-violet-800 font-extrabold text-[10px] rounded">
+                          <span className="px-1.5 py-0.5 bg-yellow-100 text-amber-900 border border-yellow-300 font-extrabold text-[10px] rounded">
                             {loc.id}
                           </span>
                           <span className="font-bold text-xs text-brand-primary">{loc.name}</span>
@@ -527,9 +527,9 @@ export default function Explore() {
                 <button
                   type="submit"
                   disabled={!fromLocation || !toLocation || routeLoading}
-                  className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary hover:bg-violet-700 text-white font-semibold py-3 px-4 text-xs shadow transition-colors disabled:opacity-50 cursor-pointer"
+                  className="flex-grow inline-flex items-center justify-center rounded-lg bg-brand-secondary hover:bg-yellow-600 text-slate-900 font-bold py-3 px-4 text-xs shadow transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  <Navigation className="w-4 h-4 mr-1.5" />
+                  <Navigation className="w-4 h-4 mr-1.5 text-slate-900" />
                   {routeLoading ? 'Calculating Route...' : 'Calculate Route'}
                 </button>
                 {activeRoute && (
@@ -549,7 +549,7 @@ export default function Explore() {
           {activeRoute && (
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 animate-fade-in">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <span className="text-xs font-bold text-brand-secondary uppercase tracking-wider">Route Summary</span>
+                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">Route Summary</span>
                 <div className="flex space-x-3 text-xs font-bold">
                   <span className="text-brand-primary">{activeRoute.distance} meters</span>
                   <span className="text-brand-muted">•</span>
@@ -558,7 +558,7 @@ export default function Explore() {
               </div>
 
               {/* Live Navigation Simulation controls */}
-              <div className="p-3 bg-violet-50/70 border border-violet-100 rounded-lg flex items-center justify-between">
+              <div className="p-3 bg-yellow-50/70 border border-yellow-200 rounded-lg flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-brand-primary">
                     {navigating ? `Step ${currentStepIdx + 1} of ${activeRoute.steps.length}` : 'Guided Walk Mode'}
@@ -574,7 +574,7 @@ export default function Explore() {
                     setCurrentStepIdx(0);
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    navigating ? 'bg-slate-200 text-slate-800' : 'bg-brand-secondary text-white shadow-sm'
+                    navigating ? 'bg-slate-200 text-slate-800' : 'bg-brand-secondary text-slate-900 shadow-sm hover:bg-yellow-600'
                   }`}
                 >
                   {navigating ? 'Stop' : 'Start Walk'}
@@ -619,7 +619,7 @@ export default function Explore() {
                     key={idx}
                     className={`flex items-start space-x-3 p-2.5 rounded-lg text-xs transition-colors ${
                       navigating && idx === currentStepIdx
-                        ? 'bg-violet-50 border border-violet-200 font-bold text-brand-primary'
+                        ? 'bg-yellow-100 border border-yellow-300 font-bold text-brand-primary'
                         : 'hover:bg-slate-50 text-slate-700'
                     }`}
                   >

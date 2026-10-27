@@ -155,7 +155,7 @@ export function AdminBuildings() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-2 px-4 text-xs shadow hover:bg-yellow-600 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Building
@@ -290,7 +290,7 @@ export function AdminBuildings() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-yellow-600 text-slate-900 rounded font-bold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Block'}
                 </button>
@@ -564,7 +564,7 @@ export function AdminRooms() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-2 px-4 text-xs shadow hover:bg-yellow-600 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Room
@@ -613,7 +613,7 @@ export function AdminRooms() {
                     <td className="p-4 capitalize">{r.buildingId?.name || 'Block B'}</td>
                     <td className="p-4">Level {r.floor !== undefined ? r.floor : (r.floorId?.floorNumber || 0)}</td>
                     <td className="p-4">
-                      <span className="px-2 py-0.5 rounded bg-violet-50 text-brand-secondary font-bold text-[9px] uppercase">
+                      <span className="px-2 py-0.5 rounded bg-yellow-100 text-amber-900 border border-yellow-300 font-bold text-[9px] uppercase">
                         {r.roomType || 'Office'}
                       </span>
                     </td>
@@ -791,7 +791,7 @@ export function AdminRooms() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-yellow-600 text-slate-900 rounded font-bold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Room'}
                 </button>
@@ -979,7 +979,7 @@ export function AdminLandmarks() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-2 px-4 text-xs shadow hover:bg-yellow-600 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Landmark
@@ -1144,7 +1144,7 @@ export function AdminLandmarks() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-yellow-600 text-slate-900 rounded font-bold cursor-pointer"
                 >
                   {editItem ? 'Save Changes' : 'Create Landmark'}
                 </button>
@@ -1300,7 +1300,7 @@ export function AdminRoutes() {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2 px-4 text-xs shadow hover:bg-violet-700 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-2 px-4 text-xs shadow hover:bg-yellow-600 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Connection Edge
@@ -1333,7 +1333,7 @@ export function AdminRoutes() {
                     <td className="p-4 font-bold text-slate-500">{item.toNode}</td>
                     <td className="p-4">{item.distance} meters</td>
                     <td className="p-4 capitalize">
-                      <span className="px-2 py-0.5 rounded bg-violet-50 text-brand-secondary font-bold text-[9px]">
+                      <span className="px-2 py-0.5 rounded bg-yellow-100 text-amber-900 border border-yellow-300 font-bold text-[9px]">
                         {item.type}
                       </span>
                     </td>
@@ -1455,7 +1455,7 @@ export function AdminRoutes() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-secondary hover:bg-violet-700 text-white rounded font-semibold cursor-pointer"
+                  className="px-4 py-2 bg-brand-secondary hover:bg-yellow-600 text-slate-900 rounded font-bold cursor-pointer"
                 >
                   Create Edge
                 </button>
@@ -1589,7 +1589,7 @@ export function AdminUsers() {
                     <td className="p-4 font-bold">{usr.name}</td>
                     <td className="p-4 capitalize">
                       <span className={`px-2.5 py-0.5 rounded font-bold text-[9px] ${
-                        usr.role === 'admin' ? 'bg-red-50 text-brand-accent-dest border border-red-200' : 'bg-violet-50 text-brand-secondary border border-violet-200'
+                        usr.role === 'admin' ? 'bg-red-50 text-brand-accent-dest border border-red-200' : 'bg-yellow-100 text-amber-900 border border-yellow-300'
                       }`}>
                         {usr.role === 'admin' ? 'Administrator' : 'Student/User'}
                       </span>
@@ -1746,7 +1746,7 @@ export function AdminReports() {
                         rep.status === 'Resolved'
                           ? 'bg-emerald-50 border-emerald-200 text-brand-accent-loc' 
                           : rep.status === 'In Progress'
-                          ? 'bg-violet-50 border-violet-200 text-brand-secondary' 
+                          ? 'bg-yellow-100 border-yellow-300 text-amber-900' 
                           : 'bg-red-50 border-red-200 text-brand-accent-dest'
                       }`}>
                         {rep.status}
@@ -1756,7 +1756,7 @@ export function AdminReports() {
                       {rep.status === 'Pending' && (
                         <button
                           onClick={() => handleProgress(rep.id)}
-                          className="px-2.5 py-1.5 bg-violet-50 text-brand-secondary rounded font-bold hover:bg-violet-100 text-[10px] cursor-pointer"
+                          className="px-2.5 py-1.5 bg-yellow-100 text-amber-900 border border-yellow-300 rounded font-bold hover:bg-yellow-200 text-[10px] cursor-pointer"
                         >
                           Start Review
                         </button>
@@ -1870,8 +1870,8 @@ export function AdminAnalytics() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Runs */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-violet-50 text-brand-secondary flex items-center justify-center flex-shrink-0">
-            <Navigation className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-yellow-100 text-amber-700 border border-yellow-300 flex items-center justify-center flex-shrink-0">
+            <Navigation className="w-6 h-6 text-amber-700" />
           </div>
           <div>
             <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider">Total Route Requests</p>
@@ -1884,15 +1884,15 @@ export function AdminAnalytics() {
 
         {/* Unique Users */}
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-violet-50 text-brand-secondary flex items-center justify-center flex-shrink-0">
-            <Users className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-yellow-100 text-amber-700 border border-yellow-300 flex items-center justify-center flex-shrink-0">
+            <Users className="w-6 h-6 text-amber-700" />
           </div>
           <div>
             <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider">Active User Cohort</p>
             <p className="text-2xl font-extrabold text-brand-primary mt-0.5">
               {loading ? '...' : `${summary.uniqueUsers} accounts`}
             </p>
-            <p className="text-[10px] text-brand-secondary font-medium mt-0.5">Distinct student & staff users</p>
+            <p className="text-[10px] text-amber-700 font-medium mt-0.5">Distinct student & staff users</p>
           </div>
         </div>
 
@@ -1933,7 +1933,7 @@ export function AdminAnalytics() {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-sm font-bold text-brand-primary uppercase tracking-wider flex items-center">
-                <TrendingUp className="w-4 h-4 text-brand-secondary mr-2" />
+                <TrendingUp className="w-4 h-4 text-amber-600 mr-2" />
                 <span>Top Navigated Targets</span>
               </h3>
               <p className="text-xs text-brand-muted mt-0.5">Room destinations ranked by live user route requests</p>
@@ -1968,25 +1968,25 @@ export function AdminAnalytics() {
 
                     return (
                       <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 font-mono font-bold text-brand-secondary">
+                        <td className="py-3 font-mono font-bold text-amber-700">
                           #{idx + 1}
                         </td>
                         <td className="py-3">
                           <div className="font-semibold text-brand-primary flex items-center">
-                            <MapPin className="w-3.5 h-3.5 text-brand-secondary mr-1.5 flex-shrink-0" />
+                            <MapPin className="w-3.5 h-3.5 text-amber-600 mr-1.5 flex-shrink-0" />
                             <span>{target.destination}</span>
                           </div>
                         </td>
                         <td className="py-3">
                           <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                             <div
-                              className="bg-brand-secondary h-2 rounded-full transition-all duration-500"
+                              className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
                               style={{ width: `${barWidth}%` }}
                             ></div>
                           </div>
                         </td>
                         <td className="py-3 text-right font-bold text-brand-primary">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-violet-50 text-brand-secondary font-bold">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-yellow-100 text-amber-900 border border-yellow-300 font-bold">
                             {target.requests} runs
                           </span>
                           <span className="text-[10px] text-brand-muted ml-1.5">({percent}%)</span>

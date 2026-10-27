@@ -202,13 +202,13 @@ export default function Locations() {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-brand-muted block">Category</label>
                 <div className="flex flex-wrap lg:flex-col gap-1">
-                  {categories.map((cat) => (
+                    {categories.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-left transition-all cursor-pointer ${
                         selectedCategory === cat
-                          ? 'bg-brand-secondary text-white'
+                          ? 'bg-yellow-500 text-slate-950 font-bold'
                           : 'text-brand-muted hover:bg-slate-50 hover:text-brand-primary'
                       }`}
                     >
@@ -226,7 +226,7 @@ export default function Locations() {
             
             {/* Search Box */}
             <div className="relative">
-              <div className="flex items-center border border-slate-300 rounded-xl bg-white shadow-sm overflow-hidden focus-within:border-brand-secondary focus-within:ring-1 focus-within:ring-brand-secondary transition-all">
+              <div className="flex items-center border border-slate-300 rounded-xl bg-white shadow-sm overflow-hidden focus-within:border-yellow-500 focus-within:ring-2 focus-within:ring-yellow-400/20 transition-all">
                 <Search className="w-5 h-5 text-brand-muted ml-4" />
                 <input
                   type="text"
@@ -271,13 +271,13 @@ export default function Locations() {
                       <div key={loc.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
                         <div>
                           <div className="flex items-center justify-between mb-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-50 text-brand-secondary">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-amber-900 border border-yellow-300">
                               {loc.category}
                             </span>
                             <span className="text-xs text-brand-muted font-medium">Floor {loc.floor === 0 ? 'Ground' : `${loc.floor}st`}</span>
                           </div>
                           
-                          <h3 className="text-lg font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">{loc.name}</h3>
+                          <h3 className="text-lg font-bold text-brand-primary group-hover:text-amber-700 transition-colors">{loc.name}</h3>
                           
                           <p className="text-xs text-brand-muted mt-1.5 flex items-center font-medium">
                             <Building2 className="w-3.5 h-3.5 mr-1 text-slate-400" />
@@ -290,9 +290,9 @@ export default function Locations() {
                         <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
                           <Link
                             to={`/explore?to=${encodeURIComponent(loc.name)}`}
-                            className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+                            className="flex-1 inline-flex items-center justify-center rounded-lg bg-brand-secondary px-3 py-2.5 text-xs font-bold text-slate-900 hover:bg-yellow-600 transition-colors shadow-sm"
                           >
-                            <Navigation className="w-3.5 h-3.5 mr-1" />
+                            <Navigation className="w-3.5 h-3.5 mr-1 text-slate-900" />
                             {locationsContent.buttons.navigateHere}
                           </Link>
                           <Link

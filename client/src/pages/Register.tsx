@@ -208,9 +208,9 @@ export default function Register() {
       return 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/20 bg-red-50/20';
     }
     if (isValid) {
-      return 'border-emerald-500/80 focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 bg-emerald-50/10';
+      return 'border-emerald-500/80 focus-within:border-yellow-500 focus-within:ring-2 focus-within:ring-yellow-400/20 bg-emerald-50/10';
     }
-    return 'border-slate-300 focus-within:border-violet-600 focus-within:ring-2 focus-within:ring-violet-500/20 bg-slate-50 focus-within:bg-white';
+    return 'border-slate-300 focus-within:border-yellow-500 focus-within:ring-2 focus-within:ring-yellow-400/20 bg-slate-50 focus-within:bg-white';
   };
 
   const getIconClass = (field: keyof FormErrors) => {
@@ -234,12 +234,12 @@ export default function Register() {
         </div>
 
         {/* Registration Precautions & Requirements Card */}
-        <div className="p-3.5 bg-violet-50/80 border border-violet-100 rounded-xl text-[11px] text-brand-primary space-y-2">
-          <p className="font-bold flex items-center text-brand-secondary">
-            <ShieldCheck className="w-4 h-4 mr-1.5 text-brand-secondary flex-shrink-0" />
+        <div className="p-3.5 bg-yellow-50/80 border border-yellow-200 rounded-xl text-[11px] text-brand-primary space-y-2">
+          <p className="font-bold flex items-center text-amber-900">
+            <ShieldCheck className="w-4 h-4 mr-1.5 text-amber-600 flex-shrink-0" />
             {content.precautions.title}
           </p>
-          <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-brand-secondary text-[11px] leading-relaxed">
+          <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-amber-500 text-[11px] leading-relaxed">
             {content.precautions.items.map((item, idx) => (
               <li key={idx}>
                 <strong>{item.label}:</strong> {item.text}
@@ -333,7 +333,7 @@ export default function Register() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="p-1 text-slate-400 hover:text-brand-secondary rounded transition-colors cursor-pointer flex-shrink-0"
+                className="p-1 text-slate-400 hover:text-amber-700 rounded transition-colors cursor-pointer flex-shrink-0"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -361,7 +361,7 @@ export default function Register() {
                         /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;~`']|[^A-Za-z0-9\s]/.test(password)
                       ].every(Boolean)
                         ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-violet-100 text-brand-secondary'
+                        : 'bg-yellow-100 text-amber-900 border border-yellow-300'
                     }`}
                   >
                     {[
@@ -423,7 +423,7 @@ export default function Register() {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                className="p-1 text-slate-400 hover:text-brand-secondary rounded transition-colors cursor-pointer flex-shrink-0"
+                className="p-1 text-slate-400 hover:text-amber-700 rounded transition-colors cursor-pointer flex-shrink-0"
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -444,7 +444,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-3 px-4 text-sm shadow-xs hover:bg-violet-700 transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full inline-flex items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-3 px-4 text-sm shadow-xs hover:bg-yellow-600 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? content.submittingText : content.submitButton}
           </button>
@@ -453,7 +453,7 @@ export default function Register() {
         {/* Redirect toggle */}
         <div className="text-center pt-2 text-xs">
           <span className="text-brand-muted">{content.switchPrompt} </span>
-          <Link to="/login" className="font-bold text-brand-secondary hover:underline">{content.switchLinkText}</Link>
+          <Link to="/login" className="font-bold text-amber-800 hover:underline">{content.switchLinkText}</Link>
         </div>
 
       </div>

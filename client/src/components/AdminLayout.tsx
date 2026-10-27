@@ -45,14 +45,13 @@ export default function AdminLayout() {
 
       {/* Sidebar Component */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 border-r border-slate-800 text-white transition-transform duration-300 md:static md:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 border-r border-slate-800 text-white transition-transform duration-300 md:static md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Sidebar Header */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-slate-800">
           <Link to="/admin" className="flex items-center space-x-2.5">
-            <ShieldAlert className="w-6 h-6 text-brand-secondary" />
+            <ShieldAlert className="w-6 h-6 text-yellow-400" />
             <span className="text-base font-bold tracking-wider text-white">IndoorNav Admin</span>
           </Link>
           <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setSidebarOpen(false)}>
@@ -69,10 +68,9 @@ export default function AdminLayout() {
               end={item.exact}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-brand-secondary text-white shadow-xs'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                `flex items-center px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? 'bg-yellow-500 text-slate-950 font-bold shadow-xs'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`
               }
             >
@@ -113,7 +111,7 @@ export default function AdminLayout() {
               <p className="text-xs font-bold text-slate-900">System Administrator</p>
               <p className="text-[10px] text-slate-500">admin@indoornav.com</p>
             </div>
-            <div className="w-9 h-9 rounded-full bg-violet-50 flex items-center justify-center text-brand-secondary font-bold text-xs border border-violet-100">
+            <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center text-amber-900 font-bold text-xs border border-yellow-300">
               A
             </div>
           </div>

@@ -93,7 +93,7 @@ export default function Buildings() {
                     {buildingFloors.slice().reverse().map((fl) => (
                       <div
                         key={fl}
-                        className="h-4 border border-brand-secondary/60 rounded flex items-center justify-center text-[8px] font-bold text-white transition-all bg-brand-secondary/40 hover:bg-brand-secondary"
+                        className="h-4 border border-yellow-400 rounded flex items-center justify-center text-[8px] font-bold text-slate-950 transition-all bg-yellow-400/80 hover:bg-yellow-400"
                       >
                         <span>FL {fl}</span>
                       </div>
@@ -109,7 +109,7 @@ export default function Buildings() {
                 {/* Building Body Details */}
                 <div className="p-6 flex-grow flex flex-col justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                    <h3 className="text-xl font-bold text-brand-primary group-hover:text-amber-700 transition-colors">
                       {building.name}
                     </h3>
                     <p className="text-xs text-brand-muted font-semibold uppercase mt-0.5 tracking-wider">
@@ -127,18 +127,18 @@ export default function Buildings() {
                   <div className="mt-6 pt-4 border-t border-slate-100">
                     <div className="flex items-center justify-between text-xs font-semibold text-brand-primary mb-4">
                       <span className="flex items-center">
-                        <Layers className="w-4 h-4 mr-1.5 text-brand-secondary" />
+                        <Layers className="w-4 h-4 mr-1.5 text-amber-600" />
                         {building.numberOfFloors} Floor Levels
                       </span>
                       <span className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-1.5 text-brand-secondary" />
+                        <MapPin className="w-4 h-4 mr-1.5 text-amber-600" />
                         {building.numberOfLocations} Managed Rooms
                       </span>
                     </div>
 
                     <Link
                       to={`/buildings/${building.code}`}
-                      className="inline-flex w-full items-center justify-center rounded-lg bg-brand-secondary text-white font-semibold py-2.5 px-4 text-sm shadow hover:bg-violet-700 transition-colors group cursor-pointer"
+                      className="inline-flex w-full items-center justify-center rounded-lg bg-brand-secondary text-slate-900 font-bold py-2.5 px-4 text-sm shadow hover:bg-yellow-600 transition-colors group cursor-pointer"
                     >
                       <span>Explore Floor Plans</span>
                       <ArrowRight className="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-1" />

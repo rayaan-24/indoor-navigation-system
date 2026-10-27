@@ -1,37 +1,65 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #1E293B;      /* Primary Text: #1E293B */
-  --color-brand-secondary: #7C3AED;    /* Primary Violet: #7C3AED */
-  --color-brand-dark: #5B21B6;         /* Dark Violet: #5B21B6 */
-  --color-brand-light: #EDE9FE;        /* Light Violet: #EDE9FE */
-  --color-brand-accent-dest: #DC2626;  /* Error: #DC2626 */
-  --color-brand-accent-loc: #16A34A;   /* Success: #16A34A */
-  --color-brand-warning: #D97706;      /* Warning: #D97706 */
-  --color-brand-bg: #F8FAFC;           /* Page Background: #F8FAFC */
-  --color-brand-card: #FFFFFF;         /* Card Background: #FFFFFF */
-  --color-brand-text: #1E293B;         /* Primary Text: #1E293B */
-  --color-brand-muted: #64748B;        /* Secondary Text: #64748B */
-  --color-brand-border: #E2E8F0;       /* Borders: #E2E8F0 */
+  --color-brand-primary: #1E293B;
+  /* Primary Text: #1E293B */
+  --color-brand-secondary: #EAB308;
+  /* Primary Yellow: #EAB308 (Yellow 500) */
+  --color-brand-dark: #CA8A04;
+  /* Dark Yellow / Amber: #CA8A04 (Yellow 600) */
+  --color-brand-light: #FEF08A;
+  /* Light Yellow: #FEF08A (Yellow 200) */
+  --color-brand-accent-dest: #DC2626;
+  /* Error: #DC2626 */
+  --color-brand-accent-loc: #16A34A;
+  /* Success: #16A34A */
+  --color-brand-warning: #D97706;
+  /* Warning: #D97706 */
+  --color-brand-bg: #F8FAFC;
+  /* Page Background: #F8FAFC */
+  --color-brand-card: #FFFFFF;
+  /* Card Background: #FFFFFF */
+  --color-brand-text: #1E293B;
+  /* Primary Text: #1E293B */
+  --color-brand-muted: #64748B;
+  /* Secondary Text: #64748B */
+  --color-brand-border: #E2E8F0;
+  /* Borders: #E2E8F0 */
 
-  --color-violet-50: #F5F3FF;
-  --color-violet-100: #EDE9FE;
-  --color-violet-200: #DDD6FE;
-  --color-violet-300: #C4B5FD;
-  --color-violet-400: #A78BFA;
-  --color-violet-500: #8B5CF6;
-  --color-violet-600: #7C3AED;
-  --color-violet-700: #6D28D9;
-  --color-violet-800: #5B21B6;
-  --color-violet-900: #4C1D95;
+  /* Remap violet scale completely to yellow/amber scale so all legacy violet classes turn yellow */
+  --color-violet-50: #FEFCE8;
+  --color-violet-100: #FEF9C3;
+  --color-violet-200: #FEF08A;
+  --color-violet-300: #FDE047;
+  --color-violet-400: #FACC15;
+  --color-violet-500: #EAB308;
+  --color-violet-600: #CA8A04;
+  --color-violet-700: #A16207;
+  --color-violet-800: #854D0E;
+  --color-violet-900: #713F12;
+
+  /* Remap purple scale to yellow/amber as well */
+  --color-purple-50: #FEFCE8;
+  --color-purple-100: #FEF9C3;
+  --color-purple-200: #FEF08A;
+  --color-purple-300: #FDE047;
+  --color-purple-400: #FACC15;
+  --color-purple-500: #EAB308;
+  --color-purple-600: #CA8A04;
+  --color-purple-700: #A16207;
+  --color-purple-800: #854D0E;
+  --color-purple-900: #713F12;
 
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 :root {
-  --primary-violet: #7C3AED;
-  --dark-violet: #5B21B6;
-  --light-violet: #EDE9FE;
+  --primary-yellow: #EAB308;
+  --dark-yellow: #CA8A04;
+  --light-yellow: #FEF08A;
+  --primary-violet: #EAB308;
+  --dark-violet: #CA8A04;
+  --light-violet: #FEF08A;
   --bg-page: #F8FAFC;
   --bg-card: #FFFFFF;
   --text-primary: #1E293B;
@@ -48,20 +76,41 @@
     background-color: var(--color-brand-bg);
     color: var(--color-brand-text);
   }
-  
+
+  /* High-contrast readable typography for yellow brand buttons */
+  .bg-brand-secondary {
+    background-color: #EAB308;
+    color: #0F172A !important;
+  }
+  .bg-brand-secondary:hover {
+    background-color: #CA8A04 !important;
+    color: #0F172A !important;
+  }
+  .bg-brand-secondary svg {
+    color: #0F172A !important;
+  }
+
+  /* Ensure text-brand-secondary has WCAG AA high contrast against white/light backgrounds */
+  .text-brand-secondary {
+    color: #A16207 !important;
+  }
+
   /* Modern clean custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 4px;
   }
+
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: #EAB308;
   }
 }

@@ -11,12 +11,12 @@ export default function Footer() {
     <footer className="w-full bg-white text-slate-600 border-t border-slate-200 pt-12 pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-100">
-          
+
           {/* Brand Info */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2.5 text-slate-900">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-secondary text-white shadow-xs">
-                <MapPin className="h-5 w-5" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-secondary text-slate-900 shadow-xs">
+                <MapPin className="h-5 w-5 text-slate-900" />
               </div>
               <span className="text-lg font-bold tracking-tight text-slate-900">{siteConfig.name}</span>
             </Link>
